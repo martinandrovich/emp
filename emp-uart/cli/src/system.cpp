@@ -51,3 +51,24 @@ void sys::echo()
 	std::vector<uint8_t> tx_data = { 0x00 };
 	uart::send(uart::UART_FRAME_TYPE::GET, tx_data);
 }
+
+void sys::get_time()
+{
+	// create payload vector and transmit data
+	std::vector<uint8_t> tx_data = { 0x01 };
+	uart::send(uart::UART_FRAME_TYPE::GET, tx_data);
+}
+
+void sys::set_time(std::string args)
+{
+
+	// split args string into vector
+	auto argsvec = cli::split_str(args);
+
+	// check size
+	if (argsvec.size() != 2) { return; }
+
+	// create payload vector and transmit data
+	std::vector<uint8_t> tx_data = { 0x01, (uint8_t)std::stoi(argsvec[0]), (uint8_t)std::stoi(argsvec[1]) };
+	uart::send(uart::UART_FRAME_TYPE::SET, tx_data);
+}

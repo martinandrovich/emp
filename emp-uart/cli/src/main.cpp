@@ -16,25 +16,19 @@ int main()
 
 		{ "echo",			[](std::string args) { sys::echo(); } },
 
-		{ "write",			[](std::string args) {}, subcmd{
+		{ "write",			[](std::string args) {}, subcmd{	
 			{ "byte",			[](std::string args) { sys::write_byte(args); }},
 			{ "array",			[](std::string args) { return; }},
 			/// ...
 		})},
 
 		{ "set",			[](std::string args) {}, subcmd{
-			{ "mode",			[](std::string args) { return; }, subcmd{
-				{ "standby",		[](std::string args) { return; } },
-				{ "manual",			[](std::string args) { return; } },
-				{ "auto",			[](std::string args) { return; } },
-				/// ...
-			})},
-			{ "pwm",			[](std::string args) { return; }},
+			{ "time",			[](std::string args) { sys::set_time(args); }},
 			/// ...
 		})},
 
 		{ "get",			[](std::string args) {}, subcmd{
-			{ "enc",			[](std::string args) { return; }},
+			{ "time",			[](std::string args) { sys::get_time(); }},
 			/// ...
 		})},
 

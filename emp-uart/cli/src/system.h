@@ -22,4 +22,6 @@ namespace sys
 	void write_array(std::string args);
 
 	void echo();
+	void get_time();
+	void set_time(std::string args);
 }
