@@ -37,6 +37,7 @@ static void _LCD_delay(uint32_t);
 static void _LCD_write(uint8_t, LCD_TYPE, NIBBLE);
 static void LCD_write_char(uint8_t, uint8_t, uint8_t);
 static void LCD_write_string(const uint8_t *, uint8_t, uint8_t, bool, bool); //    \0 escape char
+static void LCD_write_string_s(const uint8_t * data);
 static void LCD_clear();
 
 
@@ -44,19 +45,29 @@ static void LCD_clear();
 
 const struct LCD_CLASS lcd =
 {
+
 	.init			= &LCD_init,
 	.write_char		= &LCD_write_char,
 	.write_string   = &LCD_write_string,
+	.write_string_s = &LCD_write_string_s,
 	.clear          = &LCD_clear
 
 };
 
-/***********************   Constructive Functions   ************************/
+static void LCD_write_string_s(const uint8_t * data)
+/****************************************************************************
+*   Input    : implemntation, without row, column, etc
+*   Function : Send Lower and Upper Nibble
+****************************************************************************/
+{
+    LCD_clear();
+    LCD_write_string(data, 0, 5, 0, 0);
+};
 
 /*****************************   Functions   *******************************/
 static void LCD_write_string(const uint8_t * data, uint8_t row, uint8_t column, bool wrap, bool middle)
 /****************************************************************************
-*   Input    : data, row, column
+*   Input    : data, row, column, wrap - middle not implemented
 *   Function : Send Lower and Upper Nibble
 ****************************************************************************/
 {
@@ -221,6 +232,7 @@ static void LCD_clear()
 ****************************************************************************/
 {
 	_LCD_write(0x01, CMD, BOTH);
+	for(int i = 0; i < 10000; i++);
 };
 
 
@@ -273,7 +285,7 @@ static void LCD_init()
 	_LCD_write(0x06, CMD, BOTH);
 
 	// Home
-	_LCD_write(0x01, CMD, BOTH);
+	LCD_clear();
 
 }
 

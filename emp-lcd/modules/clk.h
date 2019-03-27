@@ -7,9 +7,6 @@
 * API........:	n/a
 * VERSION....:	1.0.0
 *
-* DESCRIPTION:	An example module. This might have a lengthy description, in
-*				which case, we simply add some tabs.
-*
 ****************************************************************************/
 
 #pragma once
@@ -51,14 +48,19 @@ extern struct CLOCK_CLASS
 {
 	CLK_MODE	mode;
 	CLK_ADJ_DIR adjust_dir;
+
 	TIMEPOINT*	tp_time;
+	TIMEPOINT*	tp_counter;
 
-	void 		(*callback);
+	void 		(*callback)(const uint8_t*);
 
-	void 		(* const init)(void);
+	void 		(* const init)(void (*callback)(const uint8_t*));
+
+	void 		(* const toggle_mode)(void);
+	void 		(* const toggle_dir)(void);
+
 	void 		(* const operate)(void);
-	void 		(* const adjust)(CLK_ADJ_DIR dir);
-	void 		(* const set_time)(TP_UNIT unit, uint8_t value);
+	void 		(* const adjust)();
 } clk;
 
 /****************************** End Of Module ******************************/

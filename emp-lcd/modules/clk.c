@@ -2,8 +2,8 @@
 * University of Southern Denmark
 * RB-PRO4 F19
 *
-* FILENAME...:	exm.c
-* MODULENAME.:	EXAMPLE
+* FILENAME...:	clk.h
+* MODULENAME.:	CLOCK
 *
 * For an API and DESCRIPTION, please refer to the  module
 * specification file (.h-file).
@@ -15,6 +15,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <malloc.h>
+#include <stdio.h>
+#include <assert.h>
 
 #include "clk.h"
 
@@ -26,10 +28,13 @@
 
 /************************  Function Declarations ***************************/
 
-static void 		CLK_init(void);
+static void 		CLK_init(void (*callback)(const uint8_t*));
+static void 		CLK_toggle_mode(void);
+static void 		CLK_toggle_dir(void);
 static void 		CLK_operate(void);
-static void 		CLK_adjust(CLK_ADJ_DIR dir);
-static void 		CLK_set_time(TP_UNIT unit, uint8_t value);
+static void 		CLK_adjust();
+
+static void 		_CLK_print_time();
 
 /****************************   Class Struct   *****************************/
 
@@ -37,43 +42,116 @@ struct CLOCK_CLASS clk =
 {
 	.mode 			= CLK_MODE_ADJ,
 	.adjust_dir		= CLK_ADJ_INC,
+	.tp_time		= NULL,
+	.tp_counter     = NULL,
+	.callback		= NULL,
 
 	.init			= &CLK_init,
+
+	.toggle_mode 	= &CLK_toggle_mode,
+	.toggle_dir 	= &CLK_toggle_dir,
+
 	.operate		= &CLK_operate,
-	.adjust			= &CLK_adjust,
-	.set_time		= &CLK_set_time
+	.adjust			= &CLK_adjust
 };
 
 /*****************************   Functions   *******************************/
 
-static void CLK_init(void)
+static void CLK_init(void (*callback)(const uint8_t*))
 {
 	// init TIMEPOINT
 	clk.tp_time		= tp.new();
-
-	// set time to 12:00
-	clk.set_time(h, 12);
-	clk.set_time(m, 0);
+	clk.tp_counter	= tp.new();
 
 	// set callback
-	clk.callback = NULL;
+	clk.callback = callback;
+
+	// set counter timepoint
+	tp.set(clk.tp_counter, tp.now());
+
+	// print time
+	_CLK_print_time();
+}
+
+static void CLK_toggle_mode(void)
+{
+	clk.mode = (clk.mode == CLK_MODE_RUN) ? CLK_MODE_ADJ : CLK_MODE_RUN;
+}
+
+static void CLK_toggle_dir(void)
+{
+	clk.adjust_dir = (clk.adjust_dir == CLK_ADJ_INC) ? CLK_ADJ_DEC : CLK_ADJ_INC;
 }
 
 static void CLK_operate(void)
 {
-	switch (clk.mode)
-	{
-		case CLK_MODE_RUN:
-			break;
+	// check if clock is set to run
+	if (!clk.mode == CLK_MODE_RUN) { return; }
 
-		case CLK_MODE_ADJ:
-			break;
-	}
+	// check if second has passed
+	if (tp.delta_now(clk.tp_counter, s) < 1) { return; }
+
+	// reset counter timepoint
+	tp.set(clk.tp_counter, tp.now());
+
+	// increment time timepoint
+	tp.inc(clk.tp_time, 1, s);
+
+	// check for rollover
+	;
+
+	// print time
+	_CLK_print_time();
 }
 
-static void CLK_adjust(CLK_ADJ_DIR dir)
+static void CLK_adjust()
 {
-	tp.inc(clk.tp_time, clk.adjust_dir, m);
+
+	// read from time_array
+	int8_t hh = clk.tp_time->time_array[h];
+	int8_t mm = clk.tp_time->time_array[m];
+
+	// calculate time (rollover arithmetic)
+	switch (clk.adjust_dir)
+	{
+		case CLK_ADJ_INC:
+
+			mm == 59 ? hh = (hh + 1) % 24, mm = 0 : mm++;
+			break;
+
+		case CLK_ADJ_DEC:
+
+			mm ==  0 ? hh--, mm = 59 : mm--;
+			hh == -1 ? hh = 23 : hh;
+			break;
+	}
+
+	// reset and write to time_array
+	tp.reset(clk.tp_time);
+	clk.tp_time->time_array[h] = hh;
+	clk.tp_time->time_array[m] = mm;
+
+	// print time
+	_CLK_print_time();
+}
+
+static void	_CLK_print_time()
+{
+	// check callback
+	assert(clk.callback != NULL);
+
+	static char time_str[6] = "00:00";
+
+	// construct string to output
+	// flashing ':' every odd second
+	sprintf(time_str, "%02u%c%02u",
+		clk.tp_time->time_array[h],
+		clk.tp_time->time_array[s] % 2 ? ':' : ' ',
+		clk.tp_time->time_array[m]
+	);
+
+	// output to display (callback)
+	clk.callback((uint8_t*)time_str);
 }
 
 /****************************** End Of Module ******************************/

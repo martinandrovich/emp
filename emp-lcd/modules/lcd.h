@@ -42,6 +42,7 @@ extern const struct LCD_CLASS
 	void     	(*init)();
 	void        (*write_char)(uint8_t data, uint8_t row, uint8_t column);
 	void   		(*write_string)(const uint8_t * data, uint8_t row, uint8_t column, bool wrap, bool middle);
+	void 		(*write_string_s)(const uint8_t * data);
 	void        (*clear)();
 
 } lcd;
