@@ -60,7 +60,9 @@ extern struct CLOCK_CLASS
 	void 		(* const toggle_dir)(void);
 
 	void 		(* const operate)(void);
-	void 		(* const adjust)();
+	void 		(* const adjust)(void);
+	void 		(* const set_time)(uint8_t hh, uint8_t mm);
+	uint8_t*	(* const get_timestr)(void);
 } clk;
 
 /****************************** End Of Module ******************************/
