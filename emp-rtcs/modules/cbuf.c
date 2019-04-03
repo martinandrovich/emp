@@ -26,8 +26,8 @@ static C_BUFFER*		C_BUFFER_new(uint32_t size);
 static void 			C_BUFFER_del(C_BUFFER* this);
 
 static uint32_t			C_BUFFER_length(C_BUFFER* this);
-static Q_ERROR			C_BUFFER_write(C_BUFFER* this, MESSAGE data);
-static Q_ERROR			C_BUFFER_read(C_BUFFER* this, MESSAGE* data);
+static C_BUF_ERROR		C_BUFFER_write(C_BUFFER* this, MESSAGE data);
+static C_BUF_ERROR		C_BUFFER_read(C_BUFFER* this, MESSAGE* data);
 static bool				C_BUFFER_empty(C_BUFFER* this);
 
 /****************************   Class Struct   *****************************/
@@ -75,30 +75,32 @@ static uint32_t C_BUFFER_length(C_BUFFER * this)
 	return ( ( this->head - this->tail ) & ( this->size - 1 ) );
 }
 
-static Q_ERROR C_BUFFER_write(C_BUFFER * this, message data)
+static C_BUF_ERROR C_BUFFER_write(C_BUFFER * this, message data)
 /*******************************************************************************
  * Write Data
  ******************************************************************************/
 {
-	if ( C_BUFFER_lendata( this ) == ( this->size-1 ) ) return BUFFERFULL;
+	if ( C_BUFFER_lendata( this ) == ( this->size-1 ) ) return C_BUF_FULL;
+
 	this->buffer[ this->head ] = data;
 	// disable scheduler
 	this->head = ( this->head + 1 ) & ( this->size-1 );
 	// enable scheduler
-	return DONE;
+	return C_BUF_DONE;
 }
 
-static Q_ERROR C_BUFFER_read(C_BUFFER * this, message *data)
+static C_BUF_ERROR C_BUFFER_read(C_BUFFER * this, message *data)
 /*******************************************************************************
  * Read Data
  ******************************************************************************/
 {
-	if ( C_BUFFER_lendata( this ) == 0 ) return BUFFEREMPTY;
+	if ( C_BUFFER_lendata( this ) == 0 ) return C_BUF_EMPTY;
+
 	*data = this->buffer[ this->tail ];
 	// disable scheduler
 	this->tail = ( this->tail + 1 ) & ( this->size-1 );
 	// enable scheduler
-	return DONE;
+	return C_BUF_DONE;
 }
 
 static bool C_BUFFER_empty(C_BUFFER * this)

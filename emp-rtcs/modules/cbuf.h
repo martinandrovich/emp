@@ -28,7 +28,7 @@
 typedef struct		C_BUFFER C_BUFFER;
 typedef struct		MESSAGE MESSAGE;
 typedef enum		ID ID;
-typedef enum		Q_ERROR Q_ERROR;
+typedef enum		C_BUF_ERROR C_BUF_ERROR;
 typedef enum		MESSAGE_TYPE MESSAGE_TYPE;
 
 /***********************     External Variables     ************************/
@@ -41,32 +41,32 @@ extern const struct C_BUFFER_CLASS
 {
 	C_BUFFER*		(*new)();
 	void     	    (*del)(C_BUFFER* this);
-	Q_ERROR			(*read)(C_BUFFER* this, MESSAGE data);
-	Q_ERROR			(*write)(C_BUFFER* this, MESSAGE data);
+	C_BUF_ERROR		(*read)(C_BUFFER* this, MESSAGE data);
+	C_BUF_ERROR		(*write)(C_BUFFER* this, MESSAGE data);
 	uint32_t		(*length)(C_BUFFER* this);
 	bool			(*empty)(C_BUFFER* this);
 } cbuf;
 
 /*****************************    Constructs   *****************************/
 
-enum Q_ERROR
+enum C_BUF_ERROR
 {
-	FAIL,
-	DONE,
-	BUFFERFULL,
-	BUFFEREMPTY
+	C_BUF_FAIL,
+	C_BUF_DONE,
+	C_BUF_FULL,
+	C_BUF_EMPTY
 };
 
 enum MESSAGE_TYPE
 {
-	IMPORTANT,
-	DATA
+	MESSAGE_IMPORTANT,
+	MESSAGE_DATA
 };
 
 enum ID
 {
-	INT,
-	CHAR
+	MESSAGE_ID_INT,
+	MESSAGE_ID_CHAR
 };
 
 struct MESSAGE
