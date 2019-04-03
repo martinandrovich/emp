@@ -12,7 +12,7 @@
 
 /***************************** Include files *******************************/
 
-#include "queue.h"
+#include "cbuf.h"
 
 /*****************************    Defines    *******************************/
 
@@ -58,7 +58,7 @@ static C_BUFFER * C_BUFFER_new(uint32_t size)
 	return this;
 }
 
-static void C_BUFFER_del(C_BUFFER * this)
+static void C_BUFFER_del(C_BUFFER* this)
 /*******************************************************************************
  * Delete
  ******************************************************************************/
@@ -67,7 +67,7 @@ static void C_BUFFER_del(C_BUFFER * this)
 	free( this );
 }
 
-static uint32_t C_BUFFER_length(C_BUFFER * this)
+static uint32_t C_BUFFER_length(C_BUFFER* this)
 /*******************************************************************************
  * Length Data
  ******************************************************************************/
@@ -75,7 +75,7 @@ static uint32_t C_BUFFER_length(C_BUFFER * this)
 	return ( ( this->head - this->tail ) & ( this->size - 1 ) );
 }
 
-static C_BUF_ERROR C_BUFFER_write(C_BUFFER * this, message data)
+static C_BUF_ERROR C_BUFFER_write(C_BUFFER* this, message data)
 /*******************************************************************************
  * Write Data
  ******************************************************************************/
@@ -89,7 +89,7 @@ static C_BUF_ERROR C_BUFFER_write(C_BUFFER * this, message data)
 	return C_BUF_DONE;
 }
 
-static C_BUF_ERROR C_BUFFER_read(C_BUFFER * this, message *data)
+static C_BUF_ERROR C_BUFFER_read(C_BUFFER* this, message* data)
 /*******************************************************************************
  * Read Data
  ******************************************************************************/
@@ -103,7 +103,7 @@ static C_BUF_ERROR C_BUFFER_read(C_BUFFER * this, message *data)
 	return C_BUF_DONE;
 }
 
-static bool C_BUFFER_empty(C_BUFFER * this)
+static bool C_BUFFER_empty(C_BUFFER* this)
 /*******************************************************************************
  * Write Data
  ******************************************************************************/

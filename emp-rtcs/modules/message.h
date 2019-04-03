@@ -20,14 +20,14 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <malloc.h>
-#include <message.h>
 
 #include "../tm4c123gh6pm.h"
 
 /*****************************    Defines    *******************************/
 
-typedef struct		C_BUFFER C_BUFFER;
-typedef enum		C_BUF_ERROR C_BUF_ERROR;
+typedef struct		MESSAGE MESSAGE;
+typedef enum		MESSAGE_TYPE MESSAGE_TYPE;
+typedef enum        MESSAGE_ID MESSAGE_ID;
 
 /***********************     External Variables     ************************/
 
@@ -35,32 +35,30 @@ typedef enum		C_BUF_ERROR C_BUF_ERROR;
 
 /*************************    Class Functions    ***************************/
 
-extern const struct C_BUFFER_CLASS
-{
-	C_BUFFER*		(*new)();
-	void     	    (*del)(C_BUFFER* this);
-	C_BUF_ERROR		(*read)(C_BUFFER* this, MESSAGE* data);
-	C_BUF_ERROR		(*write)(C_BUFFER* this, MESSAGE data);
-	uint32_t		(*length)(C_BUFFER* this);
-	bool			(*empty)(C_BUFFER* this);
-} cbuf;
-
 /*****************************    Constructs   *****************************/
 
-enum C_BUF_ERROR
+enum MESSAGE_TYPE
 {
-	C_BUF_FAIL,
-	C_BUF_DONE,
-	C_BUF_FULL,
-	C_BUF_EMPTY
+	MESSAGE_IMPORTANT,
+	MESSAGE_DATA
 };
 
-struct C_BUFFER
+enum MESSAGE_ID
 {
-	message*		buffer;
-	uint32_t		head;
-	uint32_t		tail;
-	uint32_t		size;
+	MESSAGE_ID_UINT8,
+    MESSAGE_ID_UINT16,
+    MESSAGE_ID_UINT32,
+    MESSAGE_ID_INT8,
+    MESSAGE_ID_INT16,
+    MESSAGE_ID_INT32,
+	MESSAGE_ID_CHAR
+};
+
+struct MESSAGE
+{
+	uint32_t		data;
+	uint32_t		id;
+	MESSAGE_TYPE	type;
 };
 
 /****************************** End Of Module ******************************/
