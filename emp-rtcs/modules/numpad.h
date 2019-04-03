@@ -30,14 +30,14 @@
 
 /*************************    Class Functions    ***************************/
 
-extern const struct LCD_CLASS
+extern const struct NUMPAD
 {
 
 	void 		(*operate)();
 	void     	(*init)();
     void        (*del)();
 
-} lcd;
+} numpad;
 
 /*****************************    Constructs   *****************************/
 
