@@ -1,10 +1,52 @@
-#include<stdio.h>
-#include<stdint.h>
-#include<malloc.h>
+/****************************************************************************
+* University of Southern Denmark
+* RB-PRO4 F19
+*
+* FILENAME...:	exm.h
+* MODULENAME.:	EXAMPLE
+* API........:	github.com/rb-pro4-f19/MCU/blob/master/README.md
+* VERSION....:	1.0.0
+*
+* DESCRIPTION:	An example module. This might have a lengthy description, in
+*				which case, we simply add some tabs.
+*
+****************************************************************************/
 
+#pragma once
 
-typedef enum Q_ERROR Q_ERROR;
-typedef enum MESSAGE_TYPE MESSAGE_TYPE;
+/***************************** Include files *******************************/
+
+#include <stdio.h>
+#include <stdint.h>
+#include <malloc.h>
+
+#include "../tm4c123gh6pm.h"
+
+/*****************************    Defines    *******************************/
+
+typedef struct      CIRC_BUFFER CIRC_BUFFER;
+typedef struct      MESSAGE MESSAGE;
+typedef enum        ID ID;
+typedef enum        Q_ERROR Q_ERROR;
+typedef enum        MESSAGE_TYPE MESSAGE_TYPE;
+
+/***********************     External Variables     ************************/
+
+/*****************************   Constants   *******************************/
+
+/*************************    Class Functions    ***************************/
+
+extern const struct CIRC_BUFFER_CLASS
+{
+
+	CIRC_BUFFER*    (*new)();
+	void     	    (*del)(CIRC_BUFFER * cb);
+    Q_ERROR         (*read)(CIRC_BUFFER * cb, MESSAGE data);
+    Q_ERROR         (*write)(CIRC_BUFFER * cb, MESSAGE data);
+    uint32_t        (*lendata)(CIRC_BUFFER * cb);
+    bool            (*empty)(CIRC_BUFFER * cb);
+
+} circ_buffer;
 
 enum Q_ERROR{
     FAIL,
@@ -24,74 +66,17 @@ enum ID {
 };
 
 typedef struct {
-    uint32_t size;
-    uint32_t ID;
-    MESSAGE_TYPE type;
-} message;
-
+    uint32_t        size;
+    uint32_t        ID;
+    MESSAGE_TYPE    type;
+} MESSAGE;
 
 typedef struct {
-    message * buffer;
-    uint32_t head;
-    uint32_t tail;
-    uint32_t size;
-} circ_bbuf;
+    message *       buffer;
+    uint32_t        head;
+    uint32_t        tail;
+    uint32_t        size;
+} CIRC_BUFFER;
+/*****************************    Constructs   *****************************/
 
-uint32_t CBlendata(circ_bbuf * cb)
-{
-    return ((cb->head - cb->tail) & (cb->size - 1));
-}
-
-static Q_ERROR CBwrite(circ_bbuf * cb, message data)
-{
-    if ( CBlendata(cb) == (cb->size-1) ) return BUFFERFULL;
-    cb->buffer[cb->head] = data;
-    // disable scheduler
-    cb->head = (cb->head + 1) & (cb->size-1);
-    // enable scheduler
-    return DONE;
-}
-
-static Q_ERROR CBread(circ_bbuf * cb, message *data)
-{
-    if ( CBlendata(cb) == 0 ) return BUFFEREMPTY;
-    *data = cb->buffer[cb->tail];
-    // disable scheduler
-    cb->tail = (cb->tail + 1) & (cb->size-1);
-    // enable scheduler
-    return DONE;
-}
-
-static circ_bbuf * CB_new(uint32_t size)
-{
-    message * buffer = malloc(size * sizeof(message));
-    circ_bbuf * this = malloc(sizeof(circ_bbuf));
-    this->buffer = buffer;
-    this->head = 0;
-    this->tail = 0;
-    this->size = size;
-    return this;
-}
-
-static void CB_del(circ_bbuf * this)
-{
-    free(this->buffer);
-    free(this);
-}
-
-int main()
-{
-    message b = {5, IMPORTANT};
-    message d = {0};
-
-    circ_bbuf * c = CB_new(32);
-
-    Q_ERROR write = CBwrite( c , b );
-
-    Q_ERROR read = CBread(c , &d );
-
-    CB_del(c);
-
-
-    return 0;
-}
+/****************************** End Of Module ******************************/
