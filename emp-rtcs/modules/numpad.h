@@ -30,12 +30,12 @@
 
 /*************************    Class Functions    ***************************/
 
-extern const struct NUMPAD
+extern struct NUMPAD
 {
+	void 		(* callback)(uint8_t byte);
 
-	void 		(*operate)(void (*callback)(void));
-	void     	(*init)();
-    void        (*del)();
+	void     	(* const init)(void (*callback)(uint8_t byte));
+	void 		(* const operate)(void);
 
 } numpad;
 
