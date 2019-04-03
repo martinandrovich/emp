@@ -22,94 +22,91 @@
 
 /************************  Function Declarations ***************************/
 
-static CIRC_BUFFER *    CIRC_BUFFER_new(uint32_t size);
-static void             CIRC_BUFFER_del(CIRC_BUFFER * cb);
-static uint32_t         CIRC_BUFFER_lendata(CIRC_BUFFER * cb);
-static Q_ERROR          CIRC_BUFFER_write(CIRC_BUFFER * cb, MESSAGE data);
-static Q_ERROR          CIRC_BUFFER_read(CIRC_BUFFER * cb, MESSAGE * data);
-static bool             CIRC_BUFFER_empty(CIRC_BUFFER * cb);
+static C_BUFFER*		C_BUFFER_new(uint32_t size);
+static void 			C_BUFFER_del(C_BUFFER* this);
+
+static uint32_t			C_BUFFER_length(C_BUFFER* this);
+static C_BUF_ERROR		C_BUFFER_write(C_BUFFER* this, MESSAGE data);
+static C_BUF_ERROR		C_BUFFER_read(C_BUFFER* this, MESSAGE* data);
+static bool				C_BUFFER_empty(C_BUFFER* this);
 
 /****************************   Class Struct   *****************************/
 
-const struct CIRC_BUFFER_CLASS circ_buffer =
+const struct C_BUFFER_CLASS cbuf =
 {
-    .new            = &CIRC_BUFFER_new,
-    .del            = &CIRC_BUFFER_del,
-    .lendata		= &CIRC_BUFFER_lendata,
-	.read		    = &CIRC_BUFFER_read,
-	.write          = &CIRC_BUFFER_write,
-    .empty          = &CIRC_BUFFER_empty
-
+	.new			= &C_BUFFER_new,
+	.del			= &C_BUFFER_del,
+	.read			= &C_BUFFER_read,
+	.write			= &C_BUFFER_write,
+	.length			= &C_BUFFER_length,
+	.empty			= &C_BUFFER_empty
 };
 
-static CIRC_BUFFER * CIRC_BUFFER_new(uint32_t size)
+static C_BUFFER * C_BUFFER_new(uint32_t size)
 /*******************************************************************************
  * Delete New
  ******************************************************************************/
 {
-    MESSAGE * buffer    = malloc( size * sizeof( MESSAGE ) );
-    CIRC_BUFFER * this  = malloc( sizeof( CIRC_BUFFER ) );
-    this->buffer        = buffer;
-    this->head          = 0;
-    this->tail          = 0;
-    this->size          = size;
-    return this;
+	MESSAGE * buffer	= malloc(size * sizeof(MESSAGE));
+	C_BUFFER * this		= malloc(sizeof(C_BUFFER));
+
+	this->size			= size;
+	this->buffer		= buffer;
+	this->head			= 0;
+	this->tail			= 0;
+
+	return this;
 }
 
-static void CIRC_BUFFER_del(CIRC_BUFFER * this)
+static void C_BUFFER_del(C_BUFFER * this)
 /*******************************************************************************
  * Delete
  ******************************************************************************/
 {
-    free( this->buffer );
-    free( this );
+	free( this->buffer );
+	free( this );
 }
 
-static uint32_t CIRC_BUFFER_lendata(CIRC_BUFFER * cb)
+static uint32_t C_BUFFER_length(C_BUFFER * this)
 /*******************************************************************************
  * Length Data
  ******************************************************************************/
 {
-    return ( ( cb->head - cb->tail ) & ( cb->size - 1 ) );
+	return ( ( this->head - this->tail ) & ( this->size - 1 ) );
 }
 
-static Q_ERROR CIRC_BUFFER_write(CIRC_BUFFER * cb, message data)
+static C_BUF_ERROR C_BUFFER_write(C_BUFFER * this, message data)
 /*******************************************************************************
  * Write Data
  ******************************************************************************/
 {
-    if ( CIRC_BUFFER_lendata( cb ) == ( cb->size-1 ) ) return BUFFERFULL;
-    cb->buffer[ cb->head ] = data;
-    // disable scheduler
-    cb->head = ( cb->head + 1 ) & ( cb->size-1 );
-    // enable scheduler
-    return DONE;
+	if ( C_BUFFER_lendata( this ) == ( this->size-1 ) ) return C_BUF_FULL;
+
+	this->buffer[ this->head ] = data;
+	// disable scheduler
+	this->head = ( this->head + 1 ) & ( this->size-1 );
+	// enable scheduler
+	return C_BUF_DONE;
 }
 
-static Q_ERROR CIRC_BUFFER_read(CIRC_BUFFER * cb, message *data)
+static C_BUF_ERROR C_BUFFER_read(C_BUFFER * this, message *data)
 /*******************************************************************************
  * Read Data
  ******************************************************************************/
 {
-    if ( CIRC_BUFFER_lendata( cb ) == 0 ) return BUFFEREMPTY;
-    *data = cb->buffer[ cb->tail ];
-    // disable scheduler
-    cb->tail = ( cb->tail + 1 ) & ( cb->size-1 );
-    // enable scheduler
-    return DONE;
+	if ( C_BUFFER_lendata( this ) == 0 ) return C_BUF_EMPTY;
+
+	*data = this->buffer[ this->tail ];
+	// disable scheduler
+	this->tail = ( this->tail + 1 ) & ( this->size-1 );
+	// enable scheduler
+	return C_BUF_DONE;
 }
 
-static bool CIRC_BUFFER_empty(CIRC_BUFFER * cb)
+static bool C_BUFFER_empty(C_BUFFER * this)
 /*******************************************************************************
  * Write Data
  ******************************************************************************/
  {
-     if ( CIRC_BUFFER_lendata( cb ) == 0 )
-     {
-         return 1;
-     }
-     else
-     {
-         return 0;
-     }
+	 return (C_BUFFER_lendata(this) == 0);
  }
