@@ -16,25 +16,15 @@
 
 /*****************************    Defines    *******************************/
 
-#define LCD_RS 2
-#define LCD_E  3
-#define PC7    7
-#define PC6	   6
-#define PC5	   5
-#define PC4	   4
-#define PD3    3
-#define PD2    2
-#define DELAY_NS(X) ( X / (62.5) ) // one clk cycle is 62.5 ns (bad approx method tho)
-
 /*****************************   Constants   *******************************/
 
 /*****************************   Variables   *******************************/
 
 /************************  Function Declarations ***************************/
 
-void 		NUMPAD_operate();
-void     	NUMPAD_init();
-void        NUMPAD_del();
+void NUMPAD_operate();
+void NUMPAD_init( void (*callback)(void) );
+void NUMPAD_del();
 
 /****************************   Class Struct   *****************************/
 
@@ -46,3 +36,37 @@ const struct NUMPAD numpad =
 	.write_string   = &NUMPAD_del
 
 };
+
+
+void NUMPAD_init( void (*callback)(void) )
+{
+    // Enable GPIO C and GPIO D Register
+	SYSCTL_RCGCGPIO_R	|= SYSCTL_RCGC2_GPIOA | SYSCTL_RCGC2_GPIOE;
+
+	asm volatile
+	(
+		"nop;"
+		"nop;"
+		"nop;"
+	);
+
+	// PORTA and PortC Direction
+	GPIO_PORTA_DIR_R	&= ~( ( 1 << 2 ) | ( 1 << 3 ) | ( 1 << 4 ) );
+	GPIO_PORTE_DIR_R	&= ~( ( 1 << 0 ) | ( 1 << 1 ) | ( 1 << 2 ) | ( 1 << 3 ) );
+
+    //
+    GPIO_PORTA_PUR_R    |= ( ( 1 << 2 ) | ( 1 << 3 ) | ( 1 << 4 ) );
+    GPIO_PORTE_PUR_R    |= ( ( 1 << 0 ) | ( 1 << 1 ) | ( 1 << 2 ) | ( 1 << 3 ) );
+
+	// PortC and PortD Digital
+	GPIO_PORTA_DEN_R	|= ( ( 1 << 2 ) | ( 1 << 3 ) | ( 1 << 4 ) );
+	GPIO_PORTE_DEN_R	|= ( ( 1 << 0 ) | ( 1 << 1 ) | ( 1 << 2 ) | ( 1 << 3 ) );
+
+
+}
+
+
+void NUMPAD_operate()
+{
+
+}

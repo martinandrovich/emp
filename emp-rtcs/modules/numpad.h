@@ -33,7 +33,7 @@
 extern const struct NUMPAD
 {
 
-	void 		(*operate)();
+	void 		(*operate)(void (*callback)(void));
 	void     	(*init)();
     void        (*del)();
 
