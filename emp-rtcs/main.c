@@ -10,6 +10,8 @@
 #include "clk.h"
 #include "lcd.h"
 #include "cli.h"
+#include "cbuf.h"
+#include "numpad.h"
 
 /*****************************    Defines    *******************************/
 
@@ -34,8 +36,11 @@ void ISR_SYSTICK(void)
 
 int main(void)
 {
+	/** Queues *************************************************************/
 
-	/** Initialization *****************************************************/
+	C_BUFFER* numpad_queue = cbuf.new(8);
+
+	/** Hardware ***** *****************************************************/
 
 	// disable interrupts
 	__disable_irq();
@@ -52,7 +57,17 @@ int main(void)
 	BUTTON* btn_sw1 = btn.new(SW1);
 
 	// init LCD display
-	lcd.init();
+	lcd.init(LAMBDA(void _(void)
+		{ clk.adjust(); }
+	));
+
+	//
+
+	// init NUMPAD
+	numpad.init(LAMBDA(void _(uint8_t byte)
+		{ cbuf.write(numpad_queue, (MESSAGE){byte, MESSAGE_ID_UINT8, MESSAGE_DATA}); }
+	));
+
 
 	// init clock with callback to LCD display
 	clk.init(lcd.write_string_s);
@@ -102,7 +117,28 @@ int main(void)
 	{
 		cli.check();
 		btn.controller(btn_sw1);
+		numpad.operate();
 		clk.operate();
+
+		// task #1
+		if (cbuf.length(numpad_queue) > 3)
+		{
+			uint8_t buf[4] = {0};
+			MESSAGE tmp_msg;
+
+			for (uint8_t* i = &buf[0]; cbuf.length(numpad_queue) > 0; ++i)
+			{
+				cbuf.read(numpad_queue, &tmp_msg);
+				*i = tmp_msg.data;
+			}
+
+			uint8_t hh = (buf[0] - '0') * 10 + (buf[1] - '0');
+			uint8_t mm = (buf[2] - '0') * 10 + (buf[3] - '0');
+
+			clk.set_time(hh, mm);
+		}
+
+		int a = cbuf.length(numpad_queue);
 	}
 
 	return 0;
