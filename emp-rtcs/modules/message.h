@@ -57,7 +57,7 @@ enum MESSAGE_ID
 struct MESSAGE
 {
 	uint32_t		data;
-	uint32_t		id;
+	MESSAGE_ID		id;
 	MESSAGE_TYPE	type;
 };
 
