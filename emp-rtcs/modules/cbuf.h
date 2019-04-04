@@ -20,7 +20,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <malloc.h>
-#include <message.h>
+
+#include "message.h"
 
 #include "../tm4c123gh6pm.h"
 
@@ -57,7 +58,7 @@ enum C_BUF_ERROR
 
 struct C_BUFFER
 {
-	message*		buffer;
+	MESSAGE*		buffer;
 	uint32_t		head;
 	uint32_t		tail;
 	uint32_t		size;

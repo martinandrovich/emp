@@ -75,12 +75,12 @@ static uint32_t C_BUFFER_length(C_BUFFER* this)
 	return ( ( this->head - this->tail ) & ( this->size - 1 ) );
 }
 
-static C_BUF_ERROR C_BUFFER_write(C_BUFFER* this, message data)
+static C_BUF_ERROR C_BUFFER_write(C_BUFFER* this, MESSAGE data)
 /*******************************************************************************
  * Write Data
  ******************************************************************************/
 {
-	if ( C_BUFFER_lendata( this ) == ( this->size-1 ) ) return C_BUF_FULL;
+	if ( cbuf.length( this ) == ( this->size-1 ) ) return C_BUF_FULL;
 
 	this->buffer[ this->head ] = data;
 	// disable scheduler
@@ -89,12 +89,12 @@ static C_BUF_ERROR C_BUFFER_write(C_BUFFER* this, message data)
 	return C_BUF_DONE;
 }
 
-static C_BUF_ERROR C_BUFFER_read(C_BUFFER* this, message* data)
+static C_BUF_ERROR C_BUFFER_read(C_BUFFER* this, MESSAGE* data)
 /*******************************************************************************
  * Read Data
  ******************************************************************************/
 {
-	if ( C_BUFFER_lendata( this ) == 0 ) return C_BUF_EMPTY;
+	if ( cbuf.length( this ) == 0 ) return C_BUF_EMPTY;
 
 	*data = this->buffer[ this->tail ];
 	// disable scheduler
@@ -108,5 +108,5 @@ static bool C_BUFFER_empty(C_BUFFER* this)
  * Write Data
  ******************************************************************************/
  {
-	 return (C_BUFFER_lendata(this) == 0);
+	 return (cbuf.length(this) == 0);
  }
