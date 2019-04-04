@@ -30,7 +30,7 @@
 
 /*************************    Class Functions    ***************************/
 
-extern struct NUMPAD
+extern struct NUMPAD_CLASS
 {
 	void 		(* callback)(uint8_t byte);
 
