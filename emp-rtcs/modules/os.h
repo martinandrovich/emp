@@ -20,39 +20,41 @@
 #include <stdbool.h>
 #include <malloc.h>
 
+#include "cbuf.h"
+
 /*****************************    Defines    *******************************/
 
-typedef struct C_BUFFER C_BUFFER;
 typedef struct TCB TCB;
 
 /***********************     External Variables     ************************/
 
 /*****************************   Constants   *******************************/
 
-/*************************    Class Functions    ***************************/
-
-extern struct OS_CLASS {
-
-    TCB tasks[20];
-    uint8_t next_id;
-
-	void (*create_task)(void (*func_ptr)(void));
-	void (*operate)(void);
-	void (*sleep)(uint8_t duration_ms);
-
-} os;
+#define MAX_NUM_TASKS 20
 
 /*****************************    Constructs   *****************************/
 
-struct TCB {
+struct TCB
+{
+	uint8_t 	state;
+	uint8_t 	id;
+	C_BUFFER* 	event_queue;
+	uint8_t 	timer;
 
-    uint8_t state;
-    uint8_t id;
-    C_BUFFER * event_queue;
-    uint8_t timer;
-    void (*task_callback)(void);
-
+	void (*callback)(void);
 };
 
+/*************************    Class Functions    ***************************/
+
+extern struct OS_CLASS
+{
+	TCB 		tasks[MAX_NUM_TASKS];
+	uint8_t 	next_id;
+
+	void (*operate)(void);
+
+	void (*create_task)(void (*callback)(void));
+	void (*sleep)(uint8_t duration_ms);
+} os;
 
 /****************************** End Of Module ******************************/

@@ -16,7 +16,7 @@
 #include <stdbool.h>
 #include <malloc.h>
 
-#include "exm.h"
+#include "os.h"
 
 /*****************************    Defines    *******************************/
 
@@ -27,45 +27,54 @@
 /************************  Function Declarations ***************************/
 
 static void 		OS_operate();
-static void 		OS_create_task(void (*func_ptr)(void));
+static void 		OS_create_task(void (*callback)(void));
 static void 		OS_sleep(uint8_t duration_ms);
 
 inline static void 	_OS_run_task(uint8_t id);
 
 /****************************   Class Struct   *****************************/
 
-static struct OS_CLASS os =
+struct OS_CLASS os =
 {
-
-	.tasks			= NULL,
 	.next_id		= 0,
 
-	.create_task	= NULL,
-	.operate		= NULL,
-	.sleep			= NULL
-
+	.create_task	= &OS_create_task,
+	.operate		= &OS_operate,
+	.sleep			= &OS_sleep
 };
 
 /*****************************   Functions   *******************************/
 
 static void OS_operate()
 {
+	;
 }
 
-static void OS_create_task(void (*func_ptr)(void))
+static void OS_create_task(void (*callback)(void))
 {
-	os.tasks[os.next_id].task_callback = function;
+
+	// check if enough space for more tasks
+	;
+
+	// assign ID and callback to TCB
 	os.tasks[os.next_id].id = os.next_id;
+	os.tasks[os.next_id].callback = callback;
+
+	// allocate event queue (CBUFFER)
+	;
+
+	// increment counter for next
 	os.next_id++;
 }
 
 static void OS_sleep(uint8_t duration_ms)
 {
+	;
 }
 
 inline static void 	_OS_run_task(uint8_t id)
 {
-	os.tasks[id].task_callback();
+	os.tasks[id].callback();
 }
 
 /****************************** End Of Module ******************************/
