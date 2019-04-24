@@ -13,21 +13,47 @@
 
 ****************************************************************************/
 
+#define DEFAULT_STACK 		128
+
 /***************************** Include files *******************************/
 
-#include "FreeRTOS.h"
+#include <FreeRTOS.h>
+#include <task.h>
+
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 #include "ctrl.h"
-#include "disp.h"
-#include "enc.h"
 
 /*****************************   Handles   *********************************/
 
+TaskHandle_t	htsk_ctrl;
+TaskHandle_t	htsk_disp;
+TaskHandle_t	htsk_enc;
 
 /*******************************   Main   **********************************/
 
 int main(void)
 {
+
+	// create controller task
+	xTaskCreate
+	(
+		ctrl.task,			/* Function that implements the task. */
+		"ctrl_task",		/* Text name for the task. */
+		DEFAULT_STACK, 		/* Stack size in words, not bytes. */
+		NULL, 				/* Parameter passed into the task. */
+		tskIDLE_PRIORITY,	/* Priority at which the task is created. */
+		&htsk_ctrl			/* Used to pass out the created task's handle. */
+	);
+
+	// ...
+
+	// start scheduler
+	;
+
+	// terminate program
 	return 0;
 }
 
