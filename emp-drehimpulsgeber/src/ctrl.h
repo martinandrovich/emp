@@ -16,16 +16,22 @@
 
 /***************************** Include files *******************************/
 
-#include <FreeRTOS.h>
-#include <task.h>
-#include "drehimpulsegeber.h"
-
 #include <stdint.h>
 #include <stdbool.h>
+
+#include <FreeRTOS.h>
+#include <task.h>
+#include <message_buffer.h>
+
+#include "drehimpulsegeber.h"
 
 /*****************************    Defines    *******************************/
 
 /***********************     External Variables     ************************/
+
+extern TaskHandle_t	htsk_ctrl;
+extern TaskHandle_t	htsk_lcd;
+extern MessageBufferHandle_t hmbf_lcd;
 
 /*****************************   Constants   *******************************/
 

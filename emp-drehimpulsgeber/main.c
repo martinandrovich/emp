@@ -20,7 +20,6 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #include <message_buffer.h>
-#include <semphr.h>
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -51,7 +50,7 @@ int main(void)
 		"ctrl_task",			/* Text name for the task. */
 		DEFAULT_STACK, 			/* Stack size in words, not bytes. */
 		NULL, 					/* Parameter passed into the task. */
-		tskIDLE_PRIORITY,		/* Priority at which the task is created. */
+		0,						/* Priority at which the task is created. */
 		&htsk_ctrl				/* Used to pass out the created task's handle. */
 	);
 
@@ -62,7 +61,7 @@ int main(void)
 		"lcd_task",				/* Text name for the task. */
 		DEFAULT_STACK, 			/* Stack size in words, not bytes. */
 		NULL, 					/* Parameter passed into the task. */
-		tskIDLE_PRIORITY,		/* Priority at which the task is created. */
+		1,						/* Priority at which the task is created. */
 		&htsk_lcd				/* Used to pass out the created task's handle. */
 	);
 
@@ -73,12 +72,12 @@ int main(void)
 		"dig_task",				/* Text name for the task. */
 		DEFAULT_STACK, 			/* Stack size in words, not bytes. */
 		NULL, 					/* Parameter passed into the task. */
-		tskIDLE_PRIORITY,		/* Priority at which the task is created. */
+		2,						/* Priority at which the task is created. */
 		&htsk_drehimpulsegeber	/* Used to pass out the created task's handle. */
 	);
 
 	// start scheduler
-	;
+	vTaskStartScheduler();
 
 	// terminate program
 	return 0;

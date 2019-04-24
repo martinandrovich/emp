@@ -56,7 +56,7 @@ extern uint32_t SystemCoreClock;
 #define configTOTAL_HEAP_SIZE                 ((size_t)(4096))
 #define configMINIMAL_STACK_SIZE              ((unsigned short)130)
 #define configCHECK_FOR_STACK_OVERFLOW        0
-#define configMAX_PRIORITIES                  (5)
+#define configMAX_PRIORITIES                  (3)
 #define configUSE_PREEMPTION                  1
 #define configIDLE_SHOULD_YIELD               1
 #define configMAX_TASK_NAME_LEN               (10)
