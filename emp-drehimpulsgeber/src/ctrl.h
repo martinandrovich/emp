@@ -41,19 +41,4 @@ extern struct CTRL_CLASS
 
 /*****************************    Constructs   *****************************/
 
-enum ENC_MSG_ID
-{
-	ENC_A,
-	ENC_B,
-	ENC_C
-};
-
-typedef struct ENCODER_MSG
-{
-	ENC_MSG_ID 	id  : 2;
-	uint32_t 	dat : 30;
-};
-
-
-
 /****************************** End Of Module ******************************/

@@ -26,7 +26,7 @@
 #include <semphr.h>
 #include <message_buffer.h>
 
-#include "digiswitch.h"
+#include "drehimpulsegeber.h"
 
 /*****************************    Defines    *******************************/
 
@@ -36,11 +36,12 @@ typedef struct  ADC_SET ADC_SET;
 
 /***********************     External Variables     ************************/
 
+extern TaskHandle_t htsk_lcd;
 extern MessageBufferHandle_t hmbf_lcd;
 
 /*****************************   Constants   *******************************/
 
-#define EXM_ARRAY_SIZE 8
+#define LCD_DATA_ARRAY_SIZE 32
 
 /*************************    Class Functions    ***************************/
 

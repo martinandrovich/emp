@@ -13,7 +13,6 @@
 /***************************** Include files *******************************/
 
 #include "lcd.h"
-#include "drehimpulsegeber.h"
 
 /*****************************    Defines    *******************************/
 
@@ -25,32 +24,29 @@
 #define PC4    4
 #define PD3    3
 #define PD2    2
+
 #define DELAY_NS(X) ( X / (62.5) ) // one clk cycle is 62.5 ns (bad approx method tho)
 
 /*****************************   Constants   *******************************/
 
 /*****************************   Variables   *******************************/
 
-extern QueueHandle_t queue_lcd;
-extern SemaphoreHandle_t semph_lcd;
-extern TaskHandle_t lcd_write_handle;
-
 /************************  Function Declarations ***************************/
 
 static void LCD_init();
-static void _LCD_delay(uint32_t);
+static void LCD_task(void* param)
+;
 static void _LCD_write(uint8_t, LCD_TYPE, NIBBLE);
+static void _LCD_delay(uint32_t);
 static void LCD_write_char(uint8_t, uint8_t, uint8_t);
-static void LCD_write_string(const uint8_t *, uint8_t, uint8_t, bool, bool); //    \0 escape char
-static void LCD_write_string_s(const uint8_t * data);
+static void LCD_write_string(const uint8_t*, uint8_t, uint8_t, bool, bool); //    \0 escape char
+static void LCD_write_string_s(const uint8_t* data);
 static void LCD_clear();
-static void LCD_task(void *pm);
 static void _LCD_split_uint16_t(uint16_t split, uint8_t * data);
-
 
 /****************************   Class Struct   *****************************/
 
-const struct LCD_CLASS lcd =
+struct LCD_CLASS lcd =
 {
 	.notification 	= 0,
 
@@ -62,17 +58,12 @@ const struct LCD_CLASS lcd =
 	.task           = &LCD_task
 };
 
-void LCD_task(void *pm)
-/****************************************************************************
-*   Input    :
-*   Function : LCD Task
-****************************************************************************/
+void LCD_task(void* param)
 {
-	static const TickType_t xDelay = pdMS_TO_TICKS(200);
-	static DREHIMPULSEGEBER_MSG* rec_msg;
-	static uint8_t data_lcd[32];
+	static uint8_t lcd_str[LCD_DATA_ARRAY_SIZE];
+	const  TickType_t block_dur = pdMS_TO_TICKS(20);
 
-	for(;;)
+	while(true)
 	{
 		// wait for task notification
 		xTaskNotifyWait
@@ -83,17 +74,23 @@ void LCD_task(void *pm)
 			portMAX_DELAY		/* Block indefinitely. */
 		);
 
-		// read
-		rec_msg = (DREHIMPULSEGEBER_MSG*)&lcd.notification;
+		// read message buffer
+		xMessageBufferReceive
+		(
+			hmbf_lcd,			/* Handle to message buffer. */
+			(void*)lcd_str,		/* Where to store the read value. */
+			sizeof(lcd_str),	/* Size of the value to read. */
+			block_dur			/* Block for some duration. */
+		);
 
 		// output data to display
-		lcd.write_string_s(data_lcd);
+		lcd.write_string_s(lcd_str);
 
 	};
 
 };
 
-static void LCD_write_string_s(const uint8_t * data)
+static void LCD_write_string_s(const uint8_t* data)
 /****************************************************************************
 *   Input    : implemntation, without row, column, etc
 *   Function : Send Lower and Upper Nibble
@@ -105,7 +102,7 @@ static void LCD_write_string_s(const uint8_t * data)
 };
 
 /*****************************   Functions   *******************************/
-static void LCD_write_string(const uint8_t * data, uint8_t row, uint8_t column, bool wrap, bool middle)
+static void LCD_write_string(const uint8_t* data, uint8_t row, uint8_t column, bool wrap, bool middle)
 /****************************************************************************
 *   Input    : data, row, column, wrap - middle not implemented
 *   Function : Send Lower and Upper Nibble

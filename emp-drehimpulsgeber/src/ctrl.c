@@ -55,21 +55,7 @@ static void CTRL_task(void* pvParameters)
 		msg = (DREHIMPULSEGEBER_MSG*)&ctrl.notification;
 
 		// perform actions
-		switch(msg->reset)
-		{
-			case true:
-			{
-				msg
-				break;
-			}
-
-			case false:
-			{
-				break;
-			}
-
-		}
-
+		;
 	}
 }
 

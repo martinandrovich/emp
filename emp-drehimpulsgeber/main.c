@@ -32,8 +32,8 @@
 /*****************************   Handles   *********************************/
 
 TaskHandle_t			htsk_ctrl;
-TaskHandle_t			htsk_disp;
-TaskHandle_t			htsk_enc;
+TaskHandle_t			htsk_lcd;
+TaskHandle_t			htsk_drehimpulsegeber;
 
 MessageBufferHandle_t	hmbf_lcd;
 
@@ -42,34 +42,40 @@ MessageBufferHandle_t	hmbf_lcd;
 int main(void)
 {
 	// create message buffers
-	hmbf_lcd = xMessageBufferCreate(xMessageBufferSizeBytes);
+	hmbf_lcd = xMessageBufferCreate(LCD_DATA_ARRAY_SIZE);
 
 	// create controller task
 	xTaskCreate
 	(
-		ctrl.task,			/* Function that implements the task. */
-		"ctrl_task",		/* Text name for the task. */
-		DEFAULT_STACK, 		/* Stack size in words, not bytes. */
-		NULL, 				/* Parameter passed into the task. */
-		tskIDLE_PRIORITY,	/* Priority at which the task is created. */
-		&htsk_ctrl			/* Used to pass out the created task's handle. */
+		ctrl.task,				/* Function that implements the task. */
+		"ctrl_task",			/* Text name for the task. */
+		DEFAULT_STACK, 			/* Stack size in words, not bytes. */
+		NULL, 					/* Parameter passed into the task. */
+		tskIDLE_PRIORITY,		/* Priority at which the task is created. */
+		&htsk_ctrl				/* Used to pass out the created task's handle. */
 	);
-
-	// create encoder task
-	;
 
 	// create LCD task
 	xTaskCreate
 	(
-		ctrl.task,			/* Function that implements the task. */
-		"ctrl_task",		/* Text name for the task. */
-		DEFAULT_STACK, 		/* Stack size in words, not bytes. */
-		NULL, 				/* Parameter passed into the task. */
-		tskIDLE_PRIORITY,	/* Priority at which the task is created. */
-		&htsk_ctrl			/* Used to pass out the created task's handle. */
+		lcd.task,				/* Function that implements the task. */
+		"lcd_task",				/* Text name for the task. */
+		DEFAULT_STACK, 			/* Stack size in words, not bytes. */
+		NULL, 					/* Parameter passed into the task. */
+		tskIDLE_PRIORITY,		/* Priority at which the task is created. */
+		&htsk_lcd				/* Used to pass out the created task's handle. */
 	);
 
-
+	// create drehimpulsegeber task
+	xTaskCreate
+	(
+		drehimpulsegeber.task,	/* Function that implements the task. */
+		"dig_task",				/* Text name for the task. */
+		DEFAULT_STACK, 			/* Stack size in words, not bytes. */
+		NULL, 					/* Parameter passed into the task. */
+		tskIDLE_PRIORITY,		/* Priority at which the task is created. */
+		&htsk_drehimpulsegeber	/* Used to pass out the created task's handle. */
+	);
 
 	// start scheduler
 	;
