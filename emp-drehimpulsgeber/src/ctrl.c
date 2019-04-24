@@ -13,6 +13,7 @@
 /***************************** Include files *******************************/
 
 #include "ctrl.h"
+#include "drehimpulsegeber.h"
 
 /*****************************    Defines    *******************************/
 
@@ -36,7 +37,7 @@ struct CTRL_CLASS ctrl =
 
 static void CTRL_task(void* pvParameters)
 {
-	static ENCODER_MSG* enc_msg;
+	static DREHIMPULSEGEBER_MSG* msg;
 
 	// task loop
 	while(true)
@@ -51,17 +52,18 @@ static void CTRL_task(void* pvParameters)
 		);
 
 		// parse notification data
-		enc_msg = (ENCODER_MSG*)&ctrl.notification;
+		msg = (DREHIMPULSEGEBER_MSG*)&ctrl.notification;
 
 		// perform actions
-		switch(enc_msg->id)
+		switch(msg->reset)
 		{
-			case ENC_A:
+			case true:
 			{
+				msg
 				break;
 			}
 
-			case ENC_B:
+			case false:
 			{
 				break;
 			}

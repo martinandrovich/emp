@@ -35,22 +35,20 @@ typedef struct DREHIMPULSEGEBER_MSG DREHIMPULSEGEBER_MSG;
 
 /*************************    Class Functions    ***************************/
 
-extern const struct DREHIMPULSEGEBER_CLASS
+extern struct DREHIMPULSEGEBER_CLASS
 {
-
-    void        (* const init)();
-    void        (* const task)(void *pm);
-
+	void        (* const init)();
+	void        (* const task)(void *pm);
 } drehimpulsegeber;
 
 
 struct DREHIMPULSEGEBER_MSG
 {
 
-    int32_t pos         : 10;
-    uint32_t revol      : 19;
-    int32_t dir         : 2;
-    uint32_t rst        : 1;
+	int32_t pos         : 10;
+	uint32_t revol      : 19;
+	int32_t dir         : 2;
+	uint32_t rst        : 1;
 
 };
 

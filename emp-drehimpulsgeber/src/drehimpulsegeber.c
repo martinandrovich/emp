@@ -18,6 +18,7 @@
 *****************************************************************************/
 
 /***************************** Include files *******************************/
+
 #include "drehimpulsegeber.h"
 
 /*****************************    Defines    *******************************/
@@ -39,11 +40,11 @@ static void DREHIMPULSEGEBER_task(void *pm);
 
 /*************************    Class Functions    ***************************/
 
-const struct DREHIMPULSEGEBER_CLASS drehimpulsegeber =
+struct DREHIMPULSEGEBER_CLASS drehimpulsegeber =
 {
 
-    .init       = &DREHIMPULSEGEBER_init,
-    .task       = &DREHIMPULSEGEBER_task
+	.init       = &DREHIMPULSEGEBER_init,
+	.task       = &DREHIMPULSEGEBER_task
 
 };
 
@@ -58,18 +59,18 @@ static void DREHIMPULSEGEBER_init()
 ******************************************************************************/
 {
 
-    SYSCTL_RCGCGPIO_R   |= SYSCTL_RCGC2_GPIOA;
+	SYSCTL_RCGCGPIO_R   |= SYSCTL_RCGC2_GPIOA;
 
-    asm volatile
-    (
-        "nop;"
-        "nop;"
-        "nop;"
-    );
+	asm volatile
+	(
+		"nop;"
+		"nop;"
+		"nop;"
+	);
 
-    GPIO_PORTA_DIR_R    &= ~( ( 1 << 5 ) | ( 1 << 6 ) | ( 1 << 7 ) );
+	GPIO_PORTA_DIR_R    &= ~( ( 1 << 5 ) | ( 1 << 6 ) | ( 1 << 7 ) );
 
-    GPIO_PORTA_DEN_R    |= ( ( 1 << 5 ) | ( 1 << 6 ) | ( 1 << 7) );
+	GPIO_PORTA_DEN_R    |= ( ( 1 << 5 ) | ( 1 << 6 ) | ( 1 << 7) );
 
 }
 
@@ -82,135 +83,135 @@ static void DREHIMPULSEGEBER_task(void *pm)
 ******************************************************************************/
 {
 
-    volatile int8_t prev_AB = ( CHECK_BIT(GPIO_PORTA_DATA_R, 5) >> 4) + ( CHECK_BIT(GPIO_PORTA_DATA_R, 6 ) << 6 );
+	volatile int8_t prev_AB = ( CHECK_BIT(GPIO_PORTA_DATA_R, 5) >> 4) + ( CHECK_BIT(GPIO_PORTA_DATA_R, 6 ) << 6 );
 
-    volatile int8_t AB [2] = { prev_AB , prev_AB };
+	volatile int8_t AB [2] = { prev_AB , prev_AB };
 
-    volatile uint8_t reset_button = 0;
+	volatile uint8_t reset_button = 0;
 
-    static int8_t dir = 0;
+	static int8_t dir = 0;
 
-    static int16_t pos = 0;
+	static int16_t pos = 0;
 
-    static uint8_t send_msg = 0;
+	static uint8_t send_msg = 0;
 
-    DIGISWITCH_MSG msg = { 0 , 0 , 0 , 0 };
+	DREHIMPULSEGEBER_MSG msg = {0};
 
-    const TickType_t xDelay = pdMS_TO_TICKS(1);
+	const TickType_t xDelay = pdMS_TO_TICKS(1);
 
-    //read initial state
+	//read initial state
 
-    for (;;)
-    {
+	for (;;)
+	{
 
-        //read reset button
-        reset_button = ( CHECK_BIT(GPIO_PORTA_DATA_R, 7) >> 7);
+		//read reset button
+		reset_button = ( CHECK_BIT(GPIO_PORTA_DATA_R, 7) >> 7);
 
-        if ( !reset_button )
-        {
-            send_msg = 1;
-        }
+		if ( !reset_button )
+		{
+			send_msg = 1;
+		}
 
-        //read from digiswitch
-        AB[0] = AB[1];
+		//read from digiswitch
+		AB[0] = AB[1];
 
-        AB[1] = ( CHECK_BIT(GPIO_PORTA_DATA_R, 5) >> 4) + ( CHECK_BIT(GPIO_PORTA_DATA_R, 6 ) >> 6 );
+		AB[1] = ( CHECK_BIT(GPIO_PORTA_DATA_R, 5) >> 4) + ( CHECK_BIT(GPIO_PORTA_DATA_R, 6 ) >> 6 );
 
-        if ( ( prev_AB == AB[1] ) || ( AB[1] != AB[0] ) )
-        {
-            dir = 0;
-        }
-        else
-        {
+		if ( ( prev_AB == AB[1] ) || ( AB[1] != AB[0] ) )
+		{
+			dir = 0;
+		}
+		else
+		{
 
-            switch ( prev_AB )
-            {
-                case 0:
+			switch ( prev_AB )
+			{
+				case 0:
 
-                    if ( AB[1] == 1 )
-                    {
-                        dir = -1;
-                    }
-                    else
-                    {
-                        dir = 1;
-                    }
+					if ( AB[1] == 1 )
+					{
+						dir = -1;
+					}
+					else
+					{
+						dir = 1;
+					}
 
-                    break;
+					break;
 
 
-                case 1:
+				case 1:
 
-                    if ( AB[1] == 3 )
-                    {
-                        dir = -1;
-                    }
-                    else
-                    {
-                        dir = 1;
-                    }
+					if ( AB[1] == 3 )
+					{
+						dir = -1;
+					}
+					else
+					{
+						dir = 1;
+					}
 
-                    break;
+					break;
 
-                case 2:
+				case 2:
 
-                    if ( AB[1] == 0 )
-                    {
-                        dir = -1;
-                    }
-                    else
-                    {
-                        dir = 1;
-                    }
+					if ( AB[1] == 0 )
+					{
+						dir = -1;
+					}
+					else
+					{
+						dir = 1;
+					}
 
-                    break;
+					break;
 
-                case 3:
+				case 3:
 
-                    if ( AB[1] == 2 )
-                    {
-                        dir = -1;
-                    }
-                    else
-                    {
-                        dir = 1;
-                    }
+					if ( AB[1] == 2 )
+					{
+						dir = -1;
+					}
+					else
+					{
+						dir = 1;
+					}
 
-                    break;
+					break;
 
-            };
+			};
 
-            send_msg = 1;
-            prev_AB = AB[1];
-            pos += (int16_t) dir;
+			send_msg = 1;
+			prev_AB = AB[1];
+			pos += (int16_t) dir;
 
-        };
+		};
 
-        if ( send_msg == 1 )
-        {
+		if ( send_msg == 1 )
+		{
 
-            msg.dir = dir;
-            msg.revol = 0;
-            msg.rst = ~reset_button;
+			msg.dir = dir;
+			msg.revol = 0;
+			msg.rst = ~reset_button;
 
-            if (!reset_button)
-            {
-                msg.pos = 0;
-                pos = 0;
-            }
-            else
-            {
-                msg.pos = pos;
-            }
+			if (!reset_button)
+			{
+				msg.pos = 0;
+				pos = 0;
+			}
+			else
+			{
+				msg.pos = pos;
+			}
 
-            send_msg = 0;
+			send_msg = 0;
 
-            uint32_t * i_msg = (uint32_t *)&msg;
-            xTaskNotify(lcd_write_handle, (*i_msg) , eSetValueWithOverwrite);
-        }
+			uint32_t * i_msg = (uint32_t *)&msg;
+			xTaskNotify(lcd_write_handle, (*i_msg) , eSetValueWithOverwrite);
+		}
 
-        vTaskDelay( xDelay );
+		vTaskDelay( xDelay );
 
-    };
+	};
 
 };

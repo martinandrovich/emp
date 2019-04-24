@@ -19,12 +19,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <malloc.h>
-#include "../tm4c123gh6pm.h"
 
 #include <FreeRTOS.h>
 #include <task.h>
 #include <queue.h>
 #include <semphr.h>
+#include <message_buffer.h>
+
 #include "digiswitch.h"
 
 /*****************************    Defines    *******************************/
@@ -35,22 +36,25 @@ typedef struct  ADC_SET ADC_SET;
 
 /***********************     External Variables     ************************/
 
+extern MessageBufferHandle_t hmbf_lcd;
+
 /*****************************   Constants   *******************************/
 
 #define EXM_ARRAY_SIZE 8
 
 /*************************    Class Functions    ***************************/
 
-extern const struct LCD_CLASS
+extern struct LCD_CLASS
 {
+	uint32_t	notification;
 
-    void        (*operate)();
-    void        (*init)();
-    void        (*write_char)(uint8_t data, uint8_t row, uint8_t column);
-    void        (*write_string)(const uint8_t * data, uint8_t row, uint8_t column, bool wrap, bool middle);
-    void        (*write_string_s)(const uint8_t * data);
-    void        (*clear)();
-    void        (*task)(void *pm);
+	void        (* const operate)();
+	void        (* const init)();
+	void        (* const write_char)(uint8_t data, uint8_t row, uint8_t column);
+	void        (* const write_string)(const uint8_t * data, uint8_t row, uint8_t column, bool wrap, bool middle);
+	void        (* const write_string_s)(const uint8_t * data);
+	void        (* const clear)();
+	void        (* const task)(void *pm);
 
 } lcd;
 
@@ -58,15 +62,15 @@ extern const struct LCD_CLASS
 
 enum NIBBLE
 {
-    UPPER,
-    LOWER,
-    BOTH
+	UPPER,
+	LOWER,
+	BOTH
 };
 
 enum LCD_TYPE
 {
-    CMD,
-    DATA
+	CMD,
+	DATA
 };
 
 /****************************** End Of Module ******************************/
