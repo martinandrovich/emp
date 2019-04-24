@@ -18,14 +18,12 @@
 
 #include <FreeRTOS.h>
 #include <task.h>
+#include "drehimpulsegeber.h"
 
 #include <stdint.h>
 #include <stdbool.h>
 
 /*****************************    Defines    *******************************/
-
-typedef struct	ENCODER_MSG ENCODER_MSG;
-typedef enum	ENC_MSG_ID ENC_MSG_ID;
 
 /***********************     External Variables     ************************/
 
