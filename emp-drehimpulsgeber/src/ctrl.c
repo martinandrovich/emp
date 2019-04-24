@@ -41,16 +41,16 @@ static void CTRL_task(void* pvParameters)
 	// task loop
 	while(true)
 	{
-		// check notification
+		// wait for task notification
 		xTaskNotifyWait
 		(
 			0x00,				/* Don't clear any notification bits on entry. */
-			UINT8_MAX,			/* Reset the notification value to 0 on exit. */
+			UINT32_MAX,			/* Reset the notification value to 0 on exit. */
 			&ctrl.notification,	/* Where to store notified value. */
 			portMAX_DELAY		/* Block indefinitely. */
 		);
 
-		// parse notification
+		// parse notification data
 		enc_msg = (ENCODER_MSG*)&ctrl.notification;
 
 		// perform actions

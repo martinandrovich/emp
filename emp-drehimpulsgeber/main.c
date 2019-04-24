@@ -48,7 +48,11 @@ int main(void)
 		&htsk_ctrl			/* Used to pass out the created task's handle. */
 	);
 
-	// ...
+	// create encoder task
+	;
+
+	// create display task
+	;
 
 	// start scheduler
 	;
