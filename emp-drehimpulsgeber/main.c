@@ -8,14 +8,18 @@
 *
 *****************************************************************************
 
-// all includes are defined in "FreeRTOSConfig.h", such as stdint.h etc.
-// more information about the system can be found in README.MD
+// all std includes are defined in "FreeRTOSConfig.h", such as stdint.h etc.
+// more information about the system can be found in "README.MD".
 
 ****************************************************************************/
 
 /***************************** Include files *******************************/
 
 #include "FreeRTOS.h"
+
+#include "ctrl.h"
+#include "disp.h"
+#include "enc.h"
 
 /*****************************   Handles   *********************************/
 
