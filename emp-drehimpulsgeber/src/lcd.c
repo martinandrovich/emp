@@ -34,8 +34,7 @@
 /************************  Function Declarations ***************************/
 
 static void LCD_init();
-static void LCD_task(void* param)
-;
+static void LCD_task(void* param);
 static void _LCD_write(uint8_t, LCD_TYPE, NIBBLE);
 static void _LCD_delay(uint32_t);
 static void LCD_write_char(uint8_t, uint8_t, uint8_t);
@@ -63,14 +62,14 @@ void LCD_task(void* param)
 	static uint8_t lcd_str[LCD_DATA_ARRAY_SIZE];
 	const  TickType_t block_dur = pdMS_TO_TICKS(20);
 
-	while(true)
+	for(;;)
 	{
 		// wait for task notification
 		xTaskNotifyWait
 		(
 			0x00,				/* Don't clear any notification bits on entry. */
 			UINT32_MAX,			/* Reset the notification value to 0 on exit. */
-			&lcd.notification,	/* Where to store notified value. */
+			&(lcd.notification),/* Where to store notified value. */
 			portMAX_DELAY		/* Block indefinitely. */
 		);
 
@@ -96,8 +95,6 @@ static void LCD_write_string_s(const uint8_t* data)
 *   Function : Send Lower and Upper Nibble
 ****************************************************************************/
 {
-	LCD_clear();
-	_LCD_delay(10);
 	LCD_write_string(data, 0, 0, 1, 0);
 };
 

@@ -41,21 +41,22 @@ static void CTRL_task(void* pvParameters)
 {
 	static DREHIMPULSEGEBER_MSG* msg;
 	static uint8_t msg_to_lcd [LCD_DATA_ARRAY_SIZE] = {' '};
+	size_t bytesparsed;
 
 	// task loop
-	while(true)
+	for(;;)
 	{
 		// wait for task notification
 		xTaskNotifyWait
 		(
 			0x00,				/* Don't clear any notification bits on entry. */
 			UINT32_MAX,			/* Reset the notification value to 0 on exit. */
-			&ctrl.notification,	/* Where to store notified value. */
+			&(ctrl.notification),	/* Where to store notified value. */
 			portMAX_DELAY		/* Block indefinitely. */
 		);
 
 		// parse notification data
-		msg = (DREHIMPULSEGEBER_MSG*)&ctrl.notification;
+		msg = (DREHIMPULSEGEBER_MSG*)&(ctrl.notification);
 
 		// clears the msg array
 		_CTRL_clear_array(msg_to_lcd);
@@ -69,10 +70,12 @@ static void CTRL_task(void* pvParameters)
 		// only if the reset button is pressed
 		if (msg->rst == true) _CTRL_reset_is_set(msg_to_lcd);
 
-    	xMessageBufferSend( 	hmbf_lcd, 				// lcd MessageBufferHandle
+    	bytesparsed = xMessageBufferSend( 	hmbf_lcd, 	// lcd MessageBufferHandle
 								( void * ) msg_to_lcd,	// array to parse
 								sizeof( msg_to_lcd ),	// size
-								0 );					// waiting time
+								100 );					// waiting time
+
+    	xTaskNotify(htsk_lcd, 0, eSetValueWithOverwrite);
 	}
 
 }
@@ -112,6 +115,8 @@ static inline void _CTRL_clear_array(uint8_t * data)
 
 		}
 	}
+
+	*(data+31) = '\0';
 }
 
 
@@ -154,14 +159,17 @@ static inline void _CTRL_set_dir(uint8_t * data, int32_t dir)
 		case -1:
 			*(data+28) = '-';
 			*(data+29) = '>';
+			break;
 
 		case 0:
 			*(data+28) = '-';
 			*(data+29) = '-';
+			break;
 
 		case 1:
 			*(data+28) = '<';
 			*(data+29) = '-';
+			break;
 	}
 }
 

@@ -13,7 +13,7 @@
 
 ****************************************************************************/
 
-#define DEFAULT_STACK 		128
+#define DEFAULT_STACK 		512
 
 /***************************** Include files *******************************/
 
@@ -48,13 +48,13 @@ int main(void)
     disable_global_int();
 
     // init hardware
-    drehimpulsegeber.init();
-    lcd.init();
     init_systick();
+    lcd.init();
+    drehimpulsegeber.init();
 
 
 	// create message buffers
-	hmbf_lcd = xMessageBufferCreate(LCD_DATA_ARRAY_SIZE);
+	hmbf_lcd = xMessageBufferCreate(LCD_DATA_ARRAY_SIZE*2);
 
 
 	// create controller task
@@ -64,7 +64,7 @@ int main(void)
 		"ctrl_task",			/* Text name for the task. */
 		DEFAULT_STACK, 			/* Stack size in words, not bytes. */
 		NULL, 					/* Parameter passed into the task. */
-		0,						/* Priority at which the task is created. */
+		1,						/* Priority at which the task is created. */
 		&htsk_ctrl				/* Used to pass out the created task's handle. */
 	);
 
@@ -75,7 +75,7 @@ int main(void)
 		"lcd_task",				/* Text name for the task. */
 		DEFAULT_STACK, 			/* Stack size in words, not bytes. */
 		NULL, 					/* Parameter passed into the task. */
-		1,						/* Priority at which the task is created. */
+		2,						/* Priority at which the task is created. */
 		&htsk_lcd				/* Used to pass out the created task's handle. */
 	);
 
@@ -86,7 +86,7 @@ int main(void)
 		"dig_task",				/* Text name for the task. */
 		DEFAULT_STACK, 			/* Stack size in words, not bytes. */
 		NULL, 					/* Parameter passed into the task. */
-		2,						/* Priority at which the task is created. */
+		1,						/* Priority at which the task is created. */
 		&htsk_drehimpulsegeber	/* Used to pass out the created task's handle. */
 	);
 
