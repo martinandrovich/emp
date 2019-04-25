@@ -62,7 +62,7 @@ static void CTRL_task(void* pvParameters)
 		_CTRL_clear_array(msg_to_lcd);
 
 		// split the position int12 to 4 chars depending msb depends on sign
-		_CTRL_split_int12((msg_to_lcd+6), msg->pos);
+		_CTRL_split_int12((msg_to_lcd+6), (msg->pos)*6);
 
 		// set the direction
 		_CTRL_set_dir(msg_to_lcd, msg->dir);
