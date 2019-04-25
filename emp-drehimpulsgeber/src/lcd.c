@@ -226,12 +226,12 @@ static void _LCD_write(uint8_t cmd, LCD_TYPE type, NIBBLE nibble)
 			//Prepare to Send Data
 			GPIO_PORTD_DATA_R = ( ( ( ( ( type == DATA ? 1 : 0 ) << LCD_RS) | ( 1 << LCD_E ) ) & 0x0C ) | ( GPIO_PORTD_DATA_R & ~0x0C ) );
 
-			_LCD_delay( DELAY_NS( 10000 ) );
+			_LCD_delay( DELAY_NS( 2000 ) );
 
 			//Set Enable Low - Send!
 			GPIO_PORTD_DATA_R = ( GPIO_PORTD_DATA_R & ~0x08 );
 
-			_LCD_delay( DELAY_NS( 10000 ) );
+			_LCD_delay( DELAY_NS( 1000 ) );
 
 			if (nibble != BOTH) { break; }
 
@@ -243,12 +243,12 @@ static void _LCD_write(uint8_t cmd, LCD_TYPE type, NIBBLE nibble)
 			//Prepare to Send Data
 			GPIO_PORTD_DATA_R = ( ( ( ( ( type == DATA ? 1 : 0 ) << LCD_RS) | ( 1 << LCD_E ) ) & 0x0C ) | ( GPIO_PORTD_DATA_R & ~0x0C ) );
 
-			_LCD_delay( DELAY_NS( 10000 ) );
+			_LCD_delay( DELAY_NS( 2000 ) );
 
 			//Set Enable Low - Send!
 			GPIO_PORTD_DATA_R = ( GPIO_PORTD_DATA_R & ~0x08 );
 
-			_LCD_delay( DELAY_NS( 10000 ) );
+			_LCD_delay( DELAY_NS( 1000 ) );
 
 			break;
 
