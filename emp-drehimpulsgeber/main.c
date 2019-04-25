@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <systick.h>
 
 #include "ctrl.h"
 #include "lcd.h"
@@ -40,8 +41,23 @@ MessageBufferHandle_t	hmbf_lcd;
 
 int main(void)
 {
+    uint8_t i = 0;
+    while(1)
+    {
+        i++;
+    };
+
+    disable_global_int();
+
+    // init hardware
+    drehimpulsegeber.init();
+    lcd.init();
+    init_systick();
+
+
 	// create message buffers
 	hmbf_lcd = xMessageBufferCreate(LCD_DATA_ARRAY_SIZE);
+
 
 	// create controller task
 	xTaskCreate
@@ -75,6 +91,10 @@ int main(void)
 		2,						/* Priority at which the task is created. */
 		&htsk_drehimpulsegeber	/* Used to pass out the created task's handle. */
 	);
+
+
+    enable_global_int();
+
 
 	// start scheduler
 	vTaskStartScheduler();

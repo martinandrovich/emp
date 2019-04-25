@@ -98,7 +98,7 @@ static void LCD_write_string_s(const uint8_t* data)
 {
 	LCD_clear();
 	_LCD_delay(10);
-	LCD_write_string(data, 0, 5, 0, 0);
+	LCD_write_string(data, 0, 0, 1, 0);
 };
 
 /*****************************   Functions   *******************************/

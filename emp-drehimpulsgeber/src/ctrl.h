@@ -24,6 +24,7 @@
 #include <message_buffer.h>
 
 #include "drehimpulsegeber.h"
+#include <lcd.h>
 
 /*****************************    Defines    *******************************/
 

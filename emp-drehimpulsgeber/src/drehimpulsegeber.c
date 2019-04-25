@@ -23,7 +23,7 @@
 
 /*****************************    Defines    *******************************/
 
-#define CHECK_BIT(var,pos) ((var) & (1<<(pos)))
+#define CHECK_BIT(var,pos) ( (var) & (1 << (pos) ) )
 
 /*****************************   Constants   *******************************/
 
@@ -72,22 +72,21 @@ static void DREHIMPULSEGEBER_task(void* param)
 	volatile int8_t AB[2] = { prev_AB, prev_AB };
 	volatile uint8_t reset_button = 0;
 
-	static int8_t 	dir = 0;
+	static int16_t 	dir = 0;
 	static int16_t 	pos = 0;
 	static bool 	send_msg = false;
 
 	DREHIMPULSEGEBER_MSG msg = {0};
 
-	//read initial state
 	while(true)
 	{
 
 		//read reset button
-		reset_button = ( CHECK_BIT(GPIO_PORTA_DATA_R, 7) >> 7);
+		reset_button = CHECK_BIT(GPIO_PORTA_DATA_R, 7) >> 7;
 
 		if (!reset_button)
 		{
-			send_msg = 1;
+			send_msg = true;
 		}
 
 		//read from digiswitch
@@ -101,76 +100,48 @@ static void DREHIMPULSEGEBER_task(void* param)
 		}
 		else
 		{
+			switch ( prev_AB )
+			{
+				case 0:
+					dir = ( AB[1] == 1 ) ? -1 : 1;
+					break;
 
-		switch ( prev_AB )
-		{
-			case 0:
+				case 1:
+					dir = ( AB[1] == 3 ) ? -1 : 1;
+					break;
 
-				if ( AB[1] == 1 )
-				{
-					dir = -1;
-				}
-				else
-				{
-					dir = 1;
-				}
+				case 2:
+					dir = ( AB[1] == 0 ) ? -1 : 1;
+					break;
 
-				break;
+				case 3:
+					dir = ( AB[1] == 2 ) ? -1 : 1;
+					break;
+			};
 
-
-			case 1:
-
-				if ( AB[1] == 3 )
-				{
-					dir = -1;
-				}
-				else
-				{
-					dir = 1;
-				}
-
-				break;
-
-			case 2:
-
-				if ( AB[1] == 0 )
-				{
-					dir = -1;
-				}
-				else
-				{
-					dir = 1;
-				}
-
-				break;
-
-			case 3:
-
-				if ( AB[1] == 2 )
-				{
-					dir = -1;
-				}
-				else
-				{
-					dir = 1;
-				}
-
-				break;
-
-		};
-
-			send_msg = true;
+			// save prev state
 			prev_AB = AB[1];
-			pos += (int16_t)dir;
+
+			// increment position
+			pos += dir;
+
+			// send notification
+			send_msg = true;
 
 		};
 
 		if (send_msg)
 		{
+			// direction parsed to msg
 			msg.dir = dir;
-			msg.revol = 0;
-			msg.rst = ~reset_button;
 
+			// revolution parsed to msg
+			msg.revol = 0;
+
+			// reset parsed to msg
+			msg.rst = !reset_button;
+
+			//
 			if (!reset_button)
 			{
 				msg.pos = 0;

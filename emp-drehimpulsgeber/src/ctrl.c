@@ -21,7 +21,10 @@
 /*****************************   Variables   *******************************/
 
 /************************  Function Declarations ***************************/
-static void _CTRL_split_int(int32_t split, uint8_t * data);
+static inline void _CTRL_split_int12(uint8_t * data, int32_t split);
+static inline void _CTRL_clear_array(uint8_t * data);
+static inline void _CTRL_reset_is_set(uint8_t * data);
+static inline void _CTRL_set_dir(uint8_t * data, int32_t dir);
 static void CTRL_task(void* pvParameters);
 
 /****************************   Class Struct   *****************************/
@@ -37,7 +40,7 @@ struct CTRL_CLASS ctrl =
 static void CTRL_task(void* pvParameters)
 {
 	static DREHIMPULSEGEBER_MSG* msg;
-	static uint8_t msg_to_lcd [32] = {' '};
+	static uint8_t msg_to_lcd [LCD_DATA_ARRAY_SIZE] = {' '};
 
 	// task loop
 	while(true)
@@ -54,76 +57,112 @@ static void CTRL_task(void* pvParameters)
 		// parse notification data
 		msg = (DREHIMPULSEGEBER_MSG*)&ctrl.notification;
 
-		msg_to_lcd[1] = 'p';
-		msg_to_lcd[2] = 'o';
-		msg_to_lcd[3] = 's';
-		msg_to_lcd[4] = ':';
+		// clears the msg array
+		_CTRL_clear_array(msg_to_lcd);
 
-		msg_to_lcd[24] = 'd';
-		msg_to_lcd[25] = 'i';
-		msg_to_lcd[26] = 'r';
-		msg_to_lcd[27] = ':';
+		// split the position int12 to 4 chars depending msb depends on sign
+		_CTRL_split_int12((msg_to_lcd+6), msg->pos);
 
-		_CTRL_split_int(msg->pos, (msg_to_lcd+6));
+		// set the direction
+		_CTRL_set_dir(msg_to_lcd, msg->dir);
 
-		// perform actions
-		switch(msg->rst)
-		{
-			case true:
-			{
-				msg_to_lcd[17] = 'r';
-				msg_to_lcd[18] = 'e';
-				msg_to_lcd[19] = 's';
-				msg_to_lcd[20] = 'e';
-				msg_to_lcd[21] = 't';
-				break;
-			}
+		// only if the reset button is pressed
+		if (msg->rst == true) _CTRL_reset_is_set(msg_to_lcd);
 
-			case false:
-			{
-				msg_to_lcd[17] = ' ';
-				msg_to_lcd[18] = ' ';
-				msg_to_lcd[19] = ' ';
-				msg_to_lcd[20] = ' ';
-				msg_to_lcd[21] = ' ';
-				break;
-			}
-
-		}
-
-		switch (msg->dir)
-		{
-			case -1:
-				msg_to_lcd[28] = '-';
-				msg_to_lcd[29] = '>';
-
-			case 0:
-				msg_to_lcd[28] = '-';
-				msg_to_lcd[29] = '-';
-
-			case 1:
-				msg_to_lcd[28] = '<';
-				msg_to_lcd[29] = '-';
-		}
-
-
-
-
+    	xMessageBufferSend( 	hmbf_lcd, 				// lcd MessageBufferHandle
+								( void * ) msg_to_lcd,	// array to parse
+								sizeof( msg_to_lcd ),	// size
+								0 );					// waiting time
 	}
 
 }
 
-static void _CTRL_split_int(int32_t split, uint8_t * data)
-{
 
-	if( split < 0 ) { *(data) = (uint8_t)'-' ;}
+static inline void _CTRL_clear_array(uint8_t * data)
+{
+	for (uint8_t i = 0; i < 32; i++)
+	{
+		switch (i)
+		{
+			case 1:
+
+				*(data+i) = 'p';
+				i++;
+				*(data+i) = 'o';
+				i++;
+				*(data+i) = 's';
+				i++;
+				*(data+i) = ':';
+				break;
+
+			case 24:
+
+				*(data+i) = 'd';
+				i++;
+				*(data+i) = 'i';
+				i++;
+				*(data+i) = 'r';
+				i++;
+				*(data+i) = ':';
+				break;
+
+			default:
+
+				*(data+i) = ' ';
+
+		}
+	}
+}
+
+
+static inline void _CTRL_split_int12(uint8_t * data, int32_t split)
+{
+    uint8_t i = 0;
+
+	if( split < 0 ) { *(data + i) = (uint8_t)'-' ;}
+
+    i++;
 
 	split *= ( split >= 0 ) ? 1 : -1;
 
-	*(data+1) = (uint8_t)( ( split / 100 ) % 10 ) + '0';
-	*(data+2) = (uint8_t)( ( split / 10 ) % 10 ) + '0';
-	*(data+3) = (uint8_t)( ( split / 1 ) % 10 ) + '0';
+	*(data+i) = (uint8_t)( ( split / 100 ) % 10 ) + '0';
+    i++;
+	*(data+i) = (uint8_t)( ( split / 10 ) % 10 ) + '0';
+    i++;
+	*(data+i) = (uint8_t)( ( split / 1 ) % 10 ) + '0';
 
+}
+
+static inline void _CTRL_reset_is_set(uint8_t * data)
+{
+    uint8_t i = 17;
+	*(data+i) = 'r';
+	i++;
+	*(data+i) = 'e';
+	i++;
+	*(data+i) = 's';
+	i++;
+	*(data+i) = 'e';
+	i++;
+	*(data+i) = 't';
+}
+
+static inline void _CTRL_set_dir(uint8_t * data, int32_t dir)
+{
+	switch (dir)
+	{
+		case -1:
+			*(data+28) = '-';
+			*(data+29) = '>';
+
+		case 0:
+			*(data+28) = '-';
+			*(data+29) = '-';
+
+		case 1:
+			*(data+28) = '<';
+			*(data+29) = '-';
+	}
 }
 
 /****************************** End Of Module ******************************/
