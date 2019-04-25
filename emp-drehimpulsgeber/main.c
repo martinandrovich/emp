@@ -41,11 +41,9 @@ MessageBufferHandle_t	hmbf_lcd;
 
 int main(void)
 {
-    uint8_t i = 0;
-    while(1)
-    {
-        i++;
-    };
+
+    // that compiler bug tho..
+    //volatile int i = 20;
 
     disable_global_int();
 
