@@ -130,6 +130,8 @@ static inline void _CTRL_split_int12(uint8_t * data, int32_t split)
 
 	split *= ( split >= 0 ) ? 1 : -1;
 
+	split %= 360;
+
 	*(data+i) = (uint8_t)( ( split / 100 ) % 10 ) + '0';
     i++;
 	*(data+i) = (uint8_t)( ( split / 10 ) % 10 ) + '0';
