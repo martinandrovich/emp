@@ -24,6 +24,9 @@
 /*****************************    Defines    *******************************/
 
 #define CHECK_BIT(var,pos) ( (var) & (1 << (pos) ) )
+#define A (CHECK_BIT(GPIO_PORTA_DATA_R, 5) >> 4)
+#define B (CHECK_BIT(GPIO_PORTA_DATA_R, 6 ) >> 6)
+#define AB A+B
 
 /*****************************   Constants   *******************************/
 
@@ -68,7 +71,7 @@ static void DREHIMPULSEGEBER_task(void* param)
 
 	const TickType_t xDelay = pdMS_TO_TICKS(1);
 
-	volatile int8_t prev_AB = (CHECK_BIT(GPIO_PORTA_DATA_R, 5) >> 4) + ( CHECK_BIT(GPIO_PORTA_DATA_R, 6 ) << 6);
+	volatile int8_t prev_AB = A + B;
 	volatile int8_t AB[2] = { prev_AB, prev_AB };
 	volatile uint8_t reset_button = 0;
 
@@ -81,52 +84,59 @@ static void DREHIMPULSEGEBER_task(void* param)
 	while(true)
 	{
 
-		//read reset button
+		// read reset button
+		// active low
 		reset_button = CHECK_BIT(GPIO_PORTA_DATA_R, 7) >> 7;
 
+		// active low
 		if (!reset_button)
 		{
+			// reset position
+			pos = 0;
+
+			// notify that new msg is sent
 			send_msg = true;
-		}
-
-		//read from digiswitch
-		AB[0] = AB[1];
-
-		AB[1] = ( CHECK_BIT(GPIO_PORTA_DATA_R, 5) >> 4) + ( CHECK_BIT(GPIO_PORTA_DATA_R, 6 ) >> 6 );
-
-		if ( ( prev_AB == AB[1] ) || ( AB[1] != AB[0] ) )
-		{
-			dir = 0;
 		}
 		else
 		{
-			switch ( prev_AB )
+			// debounce with shift Register
+			AB[0] = AB[1];
+
+			// read new AB
+			AB[1] = AB;
+
+			if ( ( prev_AB != AB[1] ) && ( AB[1] == AB[0] ) )
 			{
-				case 0:
-					dir = ( AB[1] == 1 ) ? -1 : 1;
-					break;
+				// compare with the last encoder state
+				switch ( prev_AB )
+				{
+					case 0:
+						dir = ( AB[1] == 1 ) ? -1 : 1;
+						break;
 
-				case 1:
-					dir = ( AB[1] == 3 ) ? -1 : 1;
-					break;
+					case 1:
+						dir = ( AB[1] == 3 ) ? -1 : 1;
+						break;
 
-				case 2:
-					dir = ( AB[1] == 0 ) ? -1 : 1;
-					break;
+					case 2:
+						dir = ( AB[1] == 0 ) ? -1 : 1;
+						break;
 
-				case 3:
-					dir = ( AB[1] == 2 ) ? -1 : 1;
-					break;
+					case 3:
+						dir = ( AB[1] == 2 ) ? -1 : 1;
+						break;
+				};
+
+				// save prev state
+				prev_AB = AB[1];
+
+				// increment/decrecment depending on state change
+				pos += dir;
+
+				// send notification
+				send_msg = true;
+
 			};
-
-			// save prev state
-			prev_AB = AB[1];
-
-			// increment position
-			pos += dir;
-
-			// send notification
-			send_msg = true;
 
 		};
 
@@ -135,22 +145,14 @@ static void DREHIMPULSEGEBER_task(void* param)
 			// direction parsed to msg
 			msg.dir = dir;
 
-			// revolution parsed to msg
+			// revolution parsed to msg - not implemented
 			msg.revol = 0;
 
-			// reset parsed to msg
+			// reset btn parsed to msg
 			msg.rst = !reset_button;
 
-			//
-			if (!reset_button)
-			{
-				msg.pos = 0;
-				pos = 0;
-			}
-			else
-			{
-				msg.pos = pos;
-			}
+			// send position
+			msg.pos = pos;
 
 			// convert message struct to uint32_t
 			uint32_t* msg_val = (uint32_t*)&msg;
