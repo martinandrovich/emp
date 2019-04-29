@@ -42,9 +42,7 @@ MessageBufferHandle_t	hmbf_lcd;
 int main(void)
 {
 
-    // that compiler bug tho..
-    //volatile int i = 20;
-
+	// disable global interrupts for setup
     disable_global_int();
 
     // init hardware
@@ -52,10 +50,8 @@ int main(void)
     lcd.init();
     drehimpulsegeber.init();
 
-
 	// create message buffers
-	hmbf_lcd = xMessageBufferCreate(LCD_DATA_ARRAY_SIZE*2);
-
+	hmbf_lcd = xMessageBufferCreate(LCD_DATA_ARRAY_SIZE * 2);
 
 	// create controller task
 	xTaskCreate
@@ -90,9 +86,8 @@ int main(void)
 		&htsk_drehimpulsegeber	/* Used to pass out the created task's handle. */
 	);
 
-
+	// enable global interrupts
     enable_global_int();
-
 
 	// start scheduler
 	vTaskStartScheduler();

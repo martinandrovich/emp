@@ -48,10 +48,10 @@ extern struct DREHIMPULSEGEBER_CLASS
 
 struct DREHIMPULSEGEBER_MSG
 {
-	int32_t pos         : 10;
-	uint32_t revol      : 19;
-	int32_t dir         : 2;
-	uint32_t rst        : 1;
+	int32_t 	pos		: 10;
+	uint32_t 	revol	: 19;
+	int32_t 	dir		: 2;
+	uint32_t 	rst		: 1;
 };
 
 
