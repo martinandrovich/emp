@@ -39,19 +39,21 @@ struct CTRL_CLASS ctrl =
 
 static void CTRL_task(void* pvParameters)
 {
+
 	static DREHIMPULSEGEBER_MSG* msg;
-	static uint8_t msg_to_lcd[LCD_DATA_ARRAY_SIZE] = {' '};
+	static uint8_t msg_to_lcd[LCD_DATA_ARRAY_SIZE];
 
 	// task loop
-	for(;;)
+	while(true)
 	{
+
 		// wait for task notification
 		xTaskNotifyWait
 		(
-			0x00,				/* Don't clear any notification bits on entry. */
-			UINT32_MAX,			/* Reset the notification value to 0 on exit. */
+			0x00,					/* Don't clear any notification bits on entry. */
+			UINT32_MAX,				/* Reset the notification value to 0 on exit. */
 			&(ctrl.notification),	/* Where to store notified value. */
-			portMAX_DELAY		/* Block indefinitely. */
+			portMAX_DELAY			/* Block indefinitely. */
 		);
 
 		// parse notification data
@@ -72,12 +74,13 @@ static void CTRL_task(void* pvParameters)
 		// send message to buffer
 		xMessageBufferSend
 		(
-			hmbf_lcd, 				// lcd MessageBufferHandle
-			(void*)msg_to_lcd,		// array to pass
-			sizeof(msg_to_lcd),		// size
-			0						// waiting time
+			hmbf_lcd, 				/* LCD MessageBufferHandle */
+			(void*)msg_to_lcd,		/* Pointer to the array. */
+			sizeof(msg_to_lcd),		/* Size of the passed array. */
+			0						/* The time to wait. */
 		);
 
+		// notify the LCD task
 		xTaskNotify(htsk_lcd, 0, eSetValueWithOverwrite);
 	}
 
