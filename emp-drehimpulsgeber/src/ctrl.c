@@ -70,12 +70,16 @@ static void CTRL_task(void* pvParameters)
 		// only if the reset button is pressed
 		if (msg->rst == true) _CTRL_reset_is_set(msg_to_lcd);
 
-    	bytesparsed = xMessageBufferSend( 	hmbf_lcd, 	// lcd MessageBufferHandle
-								( void * ) msg_to_lcd,	// array to parse
-								sizeof( msg_to_lcd ),	// size
-								100 );					// waiting time
+		// send message to buffer
+		xMessageBufferSend
+		(
+			hmbf_lcd, 				// lcd MessageBufferHandle
+			(void*)msg_to_lcd,		// array to pass
+			sizeof(msg_to_lcd),		// size
+			0						// waiting time
+		);
 
-    	xTaskNotify(htsk_lcd, 0, eSetValueWithOverwrite);
+		xTaskNotify(htsk_lcd, 0, eSetValueWithOverwrite);
 	}
 
 }
@@ -122,27 +126,27 @@ static inline void _CTRL_clear_array(uint8_t * data)
 
 static inline void _CTRL_split_int12(uint8_t * data, int32_t split)
 {
-    uint8_t i = 0;
+	uint8_t i = 0;
 
 	if( split < 0 ) { *(data + i) = (uint8_t)'-' ;}
 
-    i++;
+	i++;
 
 	split *= ( split >= 0 ) ? 1 : -1;
 
 	split %= 360;
 
 	*(data+i) = (uint8_t)( ( split / 100 ) % 10 ) + '0';
-    i++;
+	i++;
 	*(data+i) = (uint8_t)( ( split / 10 ) % 10 ) + '0';
-    i++;
+	i++;
 	*(data+i) = (uint8_t)( ( split / 1 ) % 10 ) + '0';
 
 }
 
 static inline void _CTRL_reset_is_set(uint8_t * data)
 {
-    uint8_t i = 17;
+	uint8_t i = 17;
 	*(data+i) = 'r';
 	i++;
 	*(data+i) = 'e';

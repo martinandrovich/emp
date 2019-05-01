@@ -43,12 +43,12 @@ int main(void)
 {
 
 	// disable global interrupts for setup
-    disable_global_int();
+	disable_global_int();
 
-    // init hardware
-    init_systick();
-    lcd.init();
-    drehimpulsegeber.init();
+	// init hardware
+	init_systick();
+	lcd.init();
+	drehimpulsegeber.init();
 
 	// create message buffers
 	hmbf_lcd = xMessageBufferCreate(LCD_DATA_ARRAY_SIZE * 2);
@@ -87,7 +87,7 @@ int main(void)
 	);
 
 	// enable global interrupts
-    enable_global_int();
+	enable_global_int();
 
 	// start scheduler
 	vTaskStartScheduler();
