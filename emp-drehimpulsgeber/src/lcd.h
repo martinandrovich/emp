@@ -49,13 +49,14 @@ extern struct LCD_CLASS
 {
 	uint32_t	notification;
 
+	void        (* const task)(void* param);
+	
 	void        (* const operate)();
 	void        (* const init)();
 	void        (* const write_char)(uint8_t data, uint8_t row, uint8_t column);
 	void        (* const write_string)(const uint8_t * data, uint8_t row, uint8_t column, bool wrap, bool middle);
 	void        (* const write_string_s)(const uint8_t * data);
 	void        (* const clear)();
-	void        (* const task)(void *pm);
 
 } lcd;
 

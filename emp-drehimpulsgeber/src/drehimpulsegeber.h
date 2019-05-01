@@ -42,7 +42,7 @@ typedef struct DREHIMPULSEGEBER_MSG DREHIMPULSEGEBER_MSG;
 extern struct DREHIMPULSEGEBER_CLASS
 {
 	void        (* const init)();
-	void        (* const task)(void *pm);
+	void        (* const task)(void* param);
 } drehimpulsegeber;
 
 

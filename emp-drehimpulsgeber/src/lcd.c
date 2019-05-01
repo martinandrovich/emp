@@ -62,32 +62,31 @@ void LCD_task(void* param)
 	static uint8_t lcd_str[LCD_DATA_ARRAY_SIZE];
 	const  TickType_t block_dur = pdMS_TO_TICKS(20);
 
-	for(;;)
+	while (true)
 	{
 		// wait for task notification
 		xTaskNotifyWait
 		(
-			0x00,				/* Don't clear any notification bits on entry. */
-			UINT32_MAX,			/* Reset the notification value to 0 on exit. */
-			&(lcd.notification),/* Where to store notified value. */
-			portMAX_DELAY		/* Block indefinitely. */
+			0x00,					/* Don't clear any notification bits on entry. */
+			UINT32_MAX,				/* Reset the notification value to 0 on exit. */
+			&(lcd.notification),	/* Where to store notified value. */
+			portMAX_DELAY			/* Block indefinitely. */
 		);
 
 		// read message buffer
 		xMessageBufferReceive
 		(
-			hmbf_lcd,			/* Handle to message buffer. */
-			(void*)lcd_str,		/* Where to store the read value. */
-			sizeof(lcd_str),	/* Size of the value to read. */
-			block_dur			/* Block for some duration. */
+			hmbf_lcd,				/* Handle to message buffer. */
+			(void*)lcd_str,			/* Where to store the read value. */
+			sizeof(lcd_str),		/* Size of the value to read. */
+			block_dur				/* Block for some duration. */
 		);
 
 		// output data to display
 		lcd.write_string_s(lcd_str);
+	}
 
-	};
-
-};
+}
 
 static void LCD_write_string_s(const uint8_t* data)
 /****************************************************************************

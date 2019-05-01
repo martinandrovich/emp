@@ -41,7 +41,7 @@ extern MessageBufferHandle_t hmbf_lcd;
 extern struct CTRL_CLASS
 {
 	uint32_t	notification;
-	void 		(*task)(void* pvParameters);
+	void 		(*task)(void* param);
 } ctrl;
 
 /*****************************    Constructs   *****************************/

@@ -45,7 +45,7 @@ static void CTRL_task(void* pvParameters)
 	static uint8_t msg_to_lcd[LCD_DATA_ARRAY_SIZE];
 
 	// task loop
-	while(true)
+	while (true)
 	{
 
 		// wait for task notification
@@ -60,6 +60,7 @@ static void CTRL_task(void* pvParameters)
 		// parse notification data
 		msg = (DREHIMPULSEGEBER_MSG*)&(ctrl.notification);
 
+		// construct message_buffer
 		_CTRL_construct_message(msg_to_lcd, msg);
 
 		// send message to buffer
@@ -88,7 +89,6 @@ static inline void _CTRL_construct_message(uint8_t * msg_to_lcd, DREHIMPULSEGEBE
 
     // only if the reset button is pressed
     if (msg->rst == true) _CTRL_reset_is_set(msg_to_lcd);
-
 };
 
 
