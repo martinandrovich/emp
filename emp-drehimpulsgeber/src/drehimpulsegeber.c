@@ -23,10 +23,10 @@
 
 /*****************************    Defines    *******************************/
 
-#define CHECK_BIT(var,pos) ( (var) & (1 << (pos) ) )
-#define A (CHECK_BIT(GPIO_PORTA_DATA_R, 5) >> 4)
-#define B (CHECK_BIT(GPIO_PORTA_DATA_R, 6 ) >> 6)
-#define AB A+B
+#define CHECK_BIT(var,pos) ( (var) & ( 1 << (pos) ) )
+#define A ( CHECK_BIT( GPIO_PORTA_DATA_R, 5 ) >> 4 )
+#define B ( CHECK_BIT( GPIO_PORTA_DATA_R, 6 ) >> 6 )
+#define AB_ (A) + (B)
 
 /*****************************   Constants   *******************************/
 
@@ -71,8 +71,8 @@ static void DREHIMPULSEGEBER_task(void* param)
 
 	const TickType_t xDelay = pdMS_TO_TICKS(1);
 
-	volatile int8_t prev_AB = A + B;
-	volatile int8_t AB[2] = { prev_AB, prev_AB };
+	volatile int8_t prev_AB = AB_;
+	volatile int8_t AB[2] = { 0 };
 	volatile uint8_t reset_button = 0;
 
 	static int16_t 	dir = 0;
@@ -93,6 +93,7 @@ static void DREHIMPULSEGEBER_task(void* param)
 		{
 			// reset position
 			pos = 0;
+			dir = 0;
 
 			// notify that new msg is sent
 			send_msg = true;
@@ -103,7 +104,7 @@ static void DREHIMPULSEGEBER_task(void* param)
 			AB[0] = AB[1];
 
 			// read new AB
-			AB[1] = AB;
+			AB[1] = AB_;
 
 			if ( ( prev_AB != AB[1] ) && ( AB[1] == AB[0] ) )
 			{
@@ -132,6 +133,8 @@ static void DREHIMPULSEGEBER_task(void* param)
 
 				// increment/decrecment depending on state change
 				pos += dir;
+
+				dir = -1*dir;
 
 				// send notification
 				send_msg = true;

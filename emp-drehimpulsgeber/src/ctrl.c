@@ -25,6 +25,7 @@ static inline void _CTRL_split_int12(uint8_t * data, int32_t split);
 static inline void _CTRL_clear_array(uint8_t * data);
 static inline void _CTRL_reset_is_set(uint8_t * data);
 static inline void _CTRL_set_dir(uint8_t * data, int32_t dir);
+static inline void _CTRL_construct_message(uint8_t * data, DREHIMPULSEGEBER_MSG* msg);
 static void CTRL_task(void* pvParameters);
 
 /****************************   Class Struct   *****************************/
@@ -58,17 +59,7 @@ static void CTRL_task(void* pvParameters)
 		// parse notification data
 		msg = (DREHIMPULSEGEBER_MSG*)&(ctrl.notification);
 
-		// clears the msg array
-		_CTRL_clear_array(msg_to_lcd);
-
-		// split the position int12 to 4 chars depending msb depends on sign
-		_CTRL_split_int12((msg_to_lcd+6), (msg->pos)*6);
-
-		// set the direction
-		_CTRL_set_dir(msg_to_lcd, msg->dir);
-
-		// only if the reset button is pressed
-		if (msg->rst == true) _CTRL_reset_is_set(msg_to_lcd);
+		_CTRL_construct_message(msg_to_lcd, msg);
 
     	bytesparsed = xMessageBufferSend( 	hmbf_lcd, 	// lcd MessageBufferHandle
 								( void * ) msg_to_lcd,	// array to parse
@@ -79,6 +70,20 @@ static void CTRL_task(void* pvParameters)
 	}
 
 }
+
+static inline void _CTRL_construct_message(uint8_t * msg_to_lcd, DREHIMPULSEGEBER_MSG* msg)
+{
+    _CTRL_clear_array(msg_to_lcd);
+
+    _CTRL_split_int12((msg_to_lcd+6), (msg->pos)*6);
+
+    // set the direction
+    _CTRL_set_dir(msg_to_lcd, msg->dir);
+
+    // only if the reset button is pressed
+    if (msg->rst == true) _CTRL_reset_is_set(msg_to_lcd);
+
+};
 
 
 static inline void _CTRL_clear_array(uint8_t * data)
