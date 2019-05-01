@@ -40,8 +40,7 @@ struct CTRL_CLASS ctrl =
 static void CTRL_task(void* pvParameters)
 {
 	static DREHIMPULSEGEBER_MSG* msg;
-	static uint8_t msg_to_lcd [LCD_DATA_ARRAY_SIZE] = {' '};
-	size_t bytesparsed;
+	static uint8_t msg_to_lcd[LCD_DATA_ARRAY_SIZE] = {' '};
 
 	// task loop
 	for(;;)
